@@ -1,6 +1,3 @@
--- online_store database
-CREATE SCHEMA `online_store` DEFAULT CHARACTER SET utf8;
-
 -- categories table
 CREATE TABLE categories(
 	category_id		INT			NOT NULL	AUTO_INCREMENT,
@@ -30,12 +27,12 @@ CREATE TABLE roles(
 
 -- users table (password - BCrypt Hash Generator)
 CREATE TABLE users(
-	user_id			INT			NOT NULL	AUTO_INCREMENT,
-	user_first_name	VARCHAR(50)	NOT NULL,
+	user_id			INT				NOT NULL	AUTO_INCREMENT,
+	user_first_name	VARCHAR(50)		NOT NULL,
 	user_last_name	VARCHAR(50),	
-	user_email		VARCHAR(50)	NOT NULL,
-	user_password	VARCHAR(50)	NOT NULL,
-	user_contact	VARCHAR(15)	NOT NULL,
+	user_email		VARCHAR(50)		NOT NULL,
+	user_password	VARCHAR(100)	NOT NULL,
+	user_contact	VARCHAR(30)		NOT NULL,
 	user_enabled	BOOLEAN,
 
 	CONSTRAINT	pk_user_id	PRIMARY KEY	(user_id)
@@ -71,7 +68,8 @@ CREATE TABLE addresses(
 -- products table 
 CREATE TABLE products(
 	product_id			INT				NOT NULL	AUTO_INCREMENT,
-	product_name		VARCHAR(50)		NOT NULL,	
+	product_name		VARCHAR(50)		NOT NULL,
+	product_code		VARCHAR(50)		NOT NULL,
 	product_brand		INT,	
 	product_unit_price	DECIMAL(10,2),
 	product_quantity	INT,
