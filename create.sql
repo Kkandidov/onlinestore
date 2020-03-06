@@ -4,7 +4,8 @@ CREATE TABLE categories(
 	name	VARCHAR(50)	NOT NULL,
 	active	BOOLEAN,
 		
-	CONSTRAINT	pk_categories_id	PRIMARY KEY	(id) 
+	CONSTRAINT	pk_categories_id	PRIMARY KEY	(id),
+	UNIQUE (name)
 )ENGINE = InnoDB;
 
 -- brands table 
@@ -14,7 +15,8 @@ CREATE TABLE brands(
 	description	VARCHAR(255),
 	active		BOOLEAN,
 	
-	CONSTRAINT	pk_brands_id	PRIMARY KEY	(id)
+	CONSTRAINT	pk_brands_id	PRIMARY KEY	(id),
+	UNIQUE (name)
 )ENGINE = InnoDB;
 
 -- roles table
@@ -39,7 +41,8 @@ CREATE TABLE users(
 	role_id			INT 			NOT NULL,
 
 	CONSTRAINT	pk_users_id			PRIMARY KEY	(id),
-	CONSTRAINT	fk_users_role_id	FOREIGN KEY (role_id)	REFERENCES	roles	(id)
+	CONSTRAINT	fk_users_role_id	FOREIGN KEY (role_id)	REFERENCES	roles	(id),
+	UNIQUE (email)
 )ENGINE = InnoDB;
 
 -- addresses table 

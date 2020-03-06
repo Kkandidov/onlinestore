@@ -46,11 +46,11 @@ VALUES('USER', true);
 
 -- populate users table (password - BCrypt Hash Generator)
 INSERT INTO users(first_name, last_name, email, password, contact_number, enabled, role_id)
--- password: 123456789
-VALUES('Ivan', 'Ivanov', 'ivan@gmail.com', '$2y$12$cAujXLjdBBiZptftPxyEc.jvHhFBycQTByXfH9yf8Magpfpc3QiOK', '+375 29 543 21 35', true, 1);
+-- password: n!k@sn1Kos
+VALUES('Ivan', 'Ivanov', 'ivan@gmail.com', '$2y$12$i5iA/3OVxdeVLB4h5ttOSecMkd1E0Vj9ywhjL449OuemuD09buJvS', '+375296543218', true, 1);
 INSERT INTO users(first_name, last_name, email, password, contact_number, enabled, role_id)
--- password: 987654321
-VALUES('Petr', 'Petrov', 'petr@gmail.com', '$2y$12$KurpV/QUOir.9rJLKb7vaOe6jxUZu9l3f7oZFUfBXtC0MmgA6N.wy', '+375 29 345 12 53', true, 2);
+-- password: J@vaC0deG##ks
+VALUES('Petr', 'Petrov', 'petr@gmail.com', '$2y$12$r4EhYmgRbDrbmfAMvE1usO/fY8yv1Z.Hp6D9OSIcYelIfjYxUj3e.', '375296543384', true, 2);
 
 -- populate addresses table 
 INSERT INTO addresses(user_id, line_one, line_two, city, state, country, postal_code, billing, shipping)

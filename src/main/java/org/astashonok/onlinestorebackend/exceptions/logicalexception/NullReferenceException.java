@@ -7,7 +7,7 @@ public class NullReferenceToRequiredObject extends OnlineStoreLogicalException {
         super("Using a null reference here is prohibited! ");
     }
 
-    public NullReferenceToRequiredObject(String msg) {
-        super("Using a null reference here is prohibited! \n"  + msg);
+    public NullReferenceToRequiredObject(String message) {
+        super("Using a null reference here is prohibited! \n"  + message);
     }
 }

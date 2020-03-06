@@ -7,7 +7,7 @@ public class NotPositiveValue extends OnlineStoreLogicalException {
         super();
     }
 
-    public NotPositiveValue(String msg) {
-        super(msg);
+    public NotPositiveValue(String message) {
+        super(message);
     }
 }
