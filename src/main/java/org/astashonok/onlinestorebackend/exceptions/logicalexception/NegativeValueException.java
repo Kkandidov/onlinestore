@@ -4,10 +4,10 @@ import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLo
 
 public class NegativeValueException extends OnlineStoreLogicalException {
     public NegativeValueException() {
-        super("The value here hasn't to be negative! ");
+        super();
     }
 
-    public NegativeValueException(String msg) {
-        super("The value here hasn't to be negative! \n" + msg);
+    public NegativeValueException(String message) {
+        super("The value must not be negative! \n" + message);
     }
 }

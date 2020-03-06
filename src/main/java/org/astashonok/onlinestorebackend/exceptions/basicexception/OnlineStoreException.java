@@ -5,8 +5,8 @@ public class OnlineStoreException extends Exception {
         super();
     }
 
-    public OnlineStoreException(String msg) {
-        super(msg);
+    public OnlineStoreException(String message) {
+        super(message);
     }
 
     public OnlineStoreException(Throwable cause) {

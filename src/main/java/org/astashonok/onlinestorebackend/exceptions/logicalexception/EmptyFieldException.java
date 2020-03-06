@@ -4,10 +4,10 @@ import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLo
 
 public class EmptyFieldException extends OnlineStoreLogicalException {
     public EmptyFieldException() {
-        super("This field has to be filled! ");
+        super();
     }
 
-    public EmptyFieldException(String msg) {
-        super("This field has to be filled! \n" + msg);
+    public EmptyFieldException(String message) {
+        super("This field must be filled ! \n" + message);
     }
 }

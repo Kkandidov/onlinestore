@@ -5,7 +5,15 @@ public class OnlineStoreTechnicalException extends OnlineStoreException {
         super();
     }
 
-    public OnlineStoreTechnicalException(String msg) {
-        super(msg);
+    public OnlineStoreTechnicalException(String message) {
+        super(message);
+    }
+
+    public OnlineStoreTechnicalException(Throwable cause) {
+        super(cause);
+    }
+
+    public OnlineStoreTechnicalException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
