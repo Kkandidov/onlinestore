@@ -3,8 +3,10 @@ package org.astashonok.onlinestorebackend.dto;
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceToRequiredObject;
+import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Category extends Entity {
@@ -14,9 +16,11 @@ public class Category extends Entity {
     private Set<Product> products;
 
     public Category() {
+        products = new HashSet<>();
     }
 
     public Category(String name, boolean active) {
+        this();
         this.name = name;
         this.active = active;
     }
@@ -32,13 +36,11 @@ public class Category extends Entity {
 
     public void setName(String name) throws OnlineStoreLogicalException {
         if (name == null) {
-            throw new NullReferenceToRequiredObject("The category has to have name ");
+            throw new NullReferenceException("The name must be indicated in the category! ");
         }
-
         if (name.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The name must be filled in the category! ");
         }
-
         this.name = name;
     }
 
@@ -54,8 +56,9 @@ public class Category extends Entity {
         return products;
     }
 
-    public void setProducts(Set<Product> products) {
-        this.products = products;
+    public void setProducts(Product... products) {
+
+        this.products.addAll(Arrays.asList(products));
     }
 
     @Override

@@ -1,7 +1,7 @@
 package org.astashonok.onlinestorebackend.dto;
 
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceToRequiredObject;
+import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
 public class Description extends Entity {
     private Product product;
@@ -39,11 +39,10 @@ public class Description extends Entity {
         return product;
     }
 
-    public void setProduct(Product product) throws NullReferenceToRequiredObject {
+    public void setProduct(Product product) throws NullReferenceException {
         if (product == null) {
-            throw new NullReferenceToRequiredObject("Description has to belong to a specific product ");
+            throw new NullReferenceException("Description has to belong to a specific product! ");
         }
-
         this.product = product;
     }
 
@@ -99,7 +98,7 @@ public class Description extends Entity {
         return battery;
     }
 
-    public void setBattery(String battery) throws NullReferenceToRequiredObject {
+    public void setBattery(String battery) {
         this.battery = battery;
     }
 

@@ -2,8 +2,7 @@ package org.astashonok.onlinestorebackend.dto;
 
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NegativeValueException;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NotPositiveValue;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceToRequiredObject;
+import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
 public class CartItem extends Entity {
     private Cart cart;
@@ -36,11 +35,10 @@ public class CartItem extends Entity {
         return cart;
     }
 
-    public void setCart(Cart cart) throws NullReferenceToRequiredObject {
+    public void setCart(Cart cart) throws NullReferenceException {
         if (cart == null) {
-            throw new NullReferenceToRequiredObject("The cart item can't exist without cart ");
+            throw new NullReferenceException("The cartItem can't exist without cart! ");
         }
-
         this.cart = cart;
     }
 
@@ -50,9 +48,8 @@ public class CartItem extends Entity {
 
     public void setTotal(double total) throws NegativeValueException {
         if (total < 0) {
-            throw new NegativeValueException();
+            throw new NegativeValueException("The total must be from 0! ");
         }
-
         this.total = total;
     }
 
@@ -60,11 +57,10 @@ public class CartItem extends Entity {
         return product;
     }
 
-    public void setProduct(Product product) throws NullReferenceToRequiredObject {
+    public void setProduct(Product product) throws NullReferenceException {
         if (product == null) {
-            throw new NullReferenceToRequiredObject("If there are cart item, then the product has to match it ");
+            throw new NullReferenceException("If there are cartItem, then the product has to match it! ");
         }
-
         this.product = product;
     }
 
@@ -72,11 +68,10 @@ public class CartItem extends Entity {
         return productCount;
     }
 
-    public void setProductCount(int productCount) throws NotPositiveValue {
-        if (productCount < 1) {
-            throw new NotPositiveValue("The product count has to have positive value! ");
+    public void setProductCount(int productCount) throws NegativeValueException {
+        if (productCount < 0) {
+            throw new NegativeValueException("The product count must be from 0! ");
         }
-
         this.productCount = productCount;
     }
 
@@ -86,9 +81,8 @@ public class CartItem extends Entity {
 
     public void setProductPrice(double productPrice) throws NegativeValueException {
         if (productPrice < 0) {
-            throw new NegativeValueException("The price can't be negative ");
+            throw new NegativeValueException("The price can't be negative! ");
         }
-
         this.productPrice = productPrice;
     }
 

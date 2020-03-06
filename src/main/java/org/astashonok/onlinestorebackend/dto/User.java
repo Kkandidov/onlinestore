@@ -2,9 +2,10 @@ package org.astashonok.onlinestorebackend.dto;
 
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceToRequiredObject;
+import org.astashonok.onlinestorebackend.exceptions.logicalexception.*;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 public class User extends Entity {
@@ -16,15 +17,20 @@ public class User extends Entity {
     private boolean enabled;
     private Role role;
 
+    private String confirmPassword;
+
     private Set<Address> addresses;
     private Set<Order> orders;
     private Cart cart;
 
     public User() {
+        this.addresses = new HashSet<>();
+        this.orders = new HashSet<>();
     }
 
     public User(String firstName, String lastName, String email, String password, String contactNumber,
                 boolean enabled, Role role) {
+        this();
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -46,13 +52,11 @@ public class User extends Entity {
 
     public void setFirstName(String firstName) throws OnlineStoreLogicalException {
         if (firstName == null) {
-            throw new NullReferenceToRequiredObject("The user has to have firs name ");
+            throw new NullReferenceException("The firstName must be indicated in the user! ");
         }
-
         if (firstName.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The firstName must be filled in the user! ");
         }
-
         this.firstName = firstName;
     }
 
@@ -70,13 +74,11 @@ public class User extends Entity {
 
     public void setEmail(String email) throws OnlineStoreLogicalException {
         if (email == null) {
-            throw new NullReferenceToRequiredObject("The user has to have email ");
+            throw new NullReferenceException("The email must be indicated in the user! ");
         }
-
         if (email.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The email must be filled in the user! ");
         }
-
         this.email = email;
     }
 
@@ -86,13 +88,11 @@ public class User extends Entity {
 
     public void setPassword(String password) throws OnlineStoreLogicalException {
         if (password == null) {
-            throw new NullReferenceToRequiredObject("The user has to have password ");
+            throw new NullReferenceException("The password must be indicated in the user! ");
         }
-
         if (password.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The password must be filled in the user! ");
         }
-
         this.password = password;
     }
 
@@ -102,13 +102,11 @@ public class User extends Entity {
 
     public void setContactNumber(String contactNumber) throws OnlineStoreLogicalException {
         if (contactNumber == null) {
-            throw new NullReferenceToRequiredObject("The user has to have contact number ");
+            throw new NullReferenceException("The contactNumber must be indicated in the user! ");
         }
-
         if (contactNumber.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The contactNumber must be filled in the user! ");
         }
-
         this.contactNumber = contactNumber;
     }
 
@@ -124,23 +122,29 @@ public class User extends Entity {
         return addresses;
     }
 
-    public void setAddresses(Set<Address> addresses) {
-        this.addresses = addresses;
+    public void setAddresses(Address...addresses) throws NullReferenceException {
+        if (addresses == null) {
+            throw new NullReferenceException("The user can't be without an address! ");
+        }
+        this.addresses.addAll(Arrays.asList(addresses));
     }
 
     public Set<Order> getOrders() {
         return orders;
     }
 
-    public void setOrders(Set<Order> orders) {
-        this.orders = orders;
+    public void setOrders(Order...orders) {
+        this.orders.addAll(Arrays.asList(orders));
     }
 
     public Cart getCart() {
         return cart;
     }
 
-    public void setCart(Cart cart) {
+    public void setCart(Cart cart) throws NullReferenceException {
+        if (cart == null) {
+            throw new NullReferenceException("The user mast be have a cart by default! ");
+        }
         this.cart = cart;
     }
 
@@ -148,12 +152,25 @@ public class User extends Entity {
         return role;
     }
 
-    public void setRole(Role role) throws NullReferenceToRequiredObject {
+    public void setRole(Role role) throws NullReferenceException {
         if (role == null) {
-            throw new NullReferenceToRequiredObject("User has to have a role ");
+            throw new NullReferenceException("The role must be indicated in the user! ");
         }
-
         this.role = role;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) throws OnlineStoreLogicalException {
+        if (confirmPassword == null) {
+            throw new NullReferenceException("The confirmPassword must not be null! ");
+        }
+        if (confirmPassword.isEmpty()){
+            throw new EmptyFieldException("The confirmPassword must not be empty! ");
+        }
+        this.confirmPassword = confirmPassword;
     }
 
     @Override

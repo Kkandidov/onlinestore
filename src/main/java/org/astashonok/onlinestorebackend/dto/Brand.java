@@ -3,8 +3,10 @@ package org.astashonok.onlinestorebackend.dto;
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceToRequiredObject;
+import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Brand extends Entity {
@@ -15,9 +17,11 @@ public class Brand extends Entity {
     private Set<Product> products;
 
     public Brand() {
+        this.products = new HashSet<>();
     }
 
     public Brand(String name, String description, boolean active) {
+        this();
         this.name = name;
         this.description = description;
         this.active = active;
@@ -34,13 +38,11 @@ public class Brand extends Entity {
 
     public void setName(String name) throws OnlineStoreLogicalException {
         if (name == null) {
-            throw new NullReferenceToRequiredObject();
+            throw new NullReferenceException("The name must be indicated in the brand! ");
         }
-
         if (name.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The name must be filled in the brand! ");
         }
-
         this.name = name;
     }
 
@@ -56,8 +58,8 @@ public class Brand extends Entity {
         return products;
     }
 
-    public void setProducts(Set<Product> products) {
-        this.products = products;
+    public void setProducts(Product...products) {
+        this.products.addAll(Arrays.asList(products));
     }
 
     public boolean isActive() {

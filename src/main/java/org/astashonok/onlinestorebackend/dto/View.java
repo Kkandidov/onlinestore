@@ -3,7 +3,7 @@ package org.astashonok.onlinestorebackend.dto;
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceToRequiredObject;
+import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
 public class View extends Entity {
     private String code;
@@ -28,13 +28,11 @@ public class View extends Entity {
 
     public void setCode(String code) throws OnlineStoreLogicalException {
         if (code == null) {
-            throw new NullReferenceToRequiredObject("The view has to have a code ");
+            throw new NullReferenceException("The code must be indicated in the view! ");
         }
-
         if (code.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The code must be filled in the view! ");
         }
-
         this.code = code;
     }
 
@@ -42,11 +40,10 @@ public class View extends Entity {
         return product;
     }
 
-    public void setProduct(Product product) throws NullReferenceToRequiredObject {
+    public void setProduct(Product product) throws NullReferenceException {
         if (product == null) {
-            throw new NullReferenceToRequiredObject("The view has to have a product ");
+            throw new NullReferenceException("The code must be product in the view! ");
         }
-
         this.product = product;
     }
 

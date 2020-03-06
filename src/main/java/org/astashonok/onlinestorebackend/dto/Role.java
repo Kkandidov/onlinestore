@@ -3,8 +3,10 @@ package org.astashonok.onlinestorebackend.dto;
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceToRequiredObject;
+import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Role extends Entity {
@@ -14,14 +16,17 @@ public class Role extends Entity {
     private Set<User> users;
 
     public Role() {
+        this.users = new HashSet<>();
     }
 
-    public Role(String name) {
+    public Role(String name, boolean active) {
+        this();
         this.name = name;
+        this.active = active;
     }
 
-    public Role(long id, String name) {
-        this.name = name;
+    public Role(long id, String name, boolean active) {
+        this(name, active);
         super.id = id;
     }
 
@@ -31,13 +36,11 @@ public class Role extends Entity {
 
     public void setName(String name) throws OnlineStoreLogicalException {
         if (name == null) {
-            throw new NullReferenceToRequiredObject("The role has to have name ");
+            throw new NullReferenceException("The name must be indicated in the role! ");
         }
-
         if (name.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The name must be filled in the role! ");
         }
-
         this.name = name;
     }
 
@@ -45,8 +48,9 @@ public class Role extends Entity {
         return users;
     }
 
-    public void setUsers(Set<User> users) {
-        this.users = users;
+    public void setUsers(User...users) {
+
+        this.users.addAll(Arrays.asList(users));
     }
 
     public boolean isActive() {

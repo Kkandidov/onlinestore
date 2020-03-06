@@ -2,8 +2,10 @@ package org.astashonok.onlinestorebackend.dto;
 
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NegativeValueException;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceToRequiredObject;
+import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Cart extends Entity {
@@ -14,6 +16,7 @@ public class Cart extends Entity {
     private Set<CartItem> cartItemSet;
 
     public Cart() {
+        this.cartItemSet = new HashSet<>();
     }
 
     public Cart(User user, double total, int cartItems) {
@@ -26,11 +29,10 @@ public class Cart extends Entity {
         return user;
     }
 
-    public void setUser(User user) throws NullReferenceToRequiredObject {
+    public void setUser(User user) throws NullReferenceException {
         if (user == null) {
-            throw new NullReferenceToRequiredObject("The cart can't exist without a user! ");
+            throw new NullReferenceException("The cart can't exist without a user! ");
         }
-
         this.user = user;
     }
 
@@ -39,8 +41,8 @@ public class Cart extends Entity {
     }
 
     public void setTotal(double total) throws NegativeValueException {
-        if (total < 0){
-            throw new NegativeValueException();
+        if (total < 0) {
+            throw new NegativeValueException("The total must be from 0! ");
         }
         this.total = total;
     }
@@ -50,8 +52,8 @@ public class Cart extends Entity {
     }
 
     public void setCartItems(int cartItems) throws NegativeValueException {
-        if (cartItems < 0){
-            throw new NegativeValueException();
+        if (cartItems < 0) {
+            throw new NegativeValueException("The count of cartItems must be from 0! ");
         }
         this.cartItems = cartItems;
     }
@@ -60,8 +62,8 @@ public class Cart extends Entity {
         return cartItemSet;
     }
 
-    public void setCartItemSet(Set<CartItem> cartItemSet) {
-        this.cartItemSet = cartItemSet;
+    public void setCartItemSet(CartItem... cartItemSet) {
+        this.cartItemSet.addAll(Arrays.asList(cartItemSet));
     }
 
     @Override

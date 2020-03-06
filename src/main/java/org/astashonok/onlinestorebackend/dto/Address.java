@@ -3,8 +3,10 @@ package org.astashonok.onlinestorebackend.dto;
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceToRequiredObject;
+import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Address extends Entity {
@@ -21,10 +23,12 @@ public class Address extends Entity {
     private Set<Order> orders;
 
     public Address() {
+        this.orders = new HashSet<>();
     }
 
     public Address(User user, String lineOne, String lineTwo, String city, String state, String country,
                    String postalCode, boolean billing, boolean shipping) {
+        this();
         this.user = user;
         this.lineOne = lineOne;
         this.lineTwo = lineTwo;
@@ -42,16 +46,14 @@ public class Address extends Entity {
         super.id = id;
     }
 
-
     public User getUser() {
         return user;
     }
 
-    public void setUser(User user) throws NullReferenceToRequiredObject {
+    public void setUser(User user) throws NullReferenceException {
         if (user == null) {
-            throw new NullReferenceToRequiredObject("The address can't exist without a user! ");
+            throw new NullReferenceException("The address can't exist without a user! ");
         }
-
         this.user = user;
     }
 
@@ -61,13 +63,11 @@ public class Address extends Entity {
 
     public void setLineOne(String lineOne) throws OnlineStoreLogicalException {
         if (lineOne == null) {
-            throw new NullReferenceToRequiredObject();
+            throw new NullReferenceException("The lineOne must be indicated in the address! ");
         }
-
         if (lineOne.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The lineOne must be filled in the address! ");
         }
-
         this.lineOne = lineOne;
     }
 
@@ -85,13 +85,11 @@ public class Address extends Entity {
 
     public void setCity(String city) throws OnlineStoreLogicalException {
         if (city == null) {
-            throw new NullReferenceToRequiredObject();
+            throw new NullReferenceException("The city must be indicated in the address! ");
         }
-
         if (city.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The city must be filled in the address! ");
         }
-
         this.city = city;
     }
 
@@ -101,13 +99,11 @@ public class Address extends Entity {
 
     public void setState(String state) throws OnlineStoreLogicalException {
         if (state == null) {
-            throw new NullReferenceToRequiredObject();
+            throw new NullReferenceException("The state must be indicated in the address! ");
         }
-
         if (state.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The state must be filled in the address! ");
         }
-
         this.state = state;
     }
 
@@ -117,13 +113,11 @@ public class Address extends Entity {
 
     public void setCountry(String country) throws OnlineStoreLogicalException {
         if (country == null) {
-            throw new NullReferenceToRequiredObject();
+            throw new NullReferenceException("The country must be indicated in the address! ");
         }
-
         if (country.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The country must be filled in the address! ");
         }
-
         this.country = country;
     }
 
@@ -133,13 +127,11 @@ public class Address extends Entity {
 
     public void setPostalCode(String postalCode) throws OnlineStoreLogicalException {
         if (postalCode == null) {
-            throw new NullReferenceToRequiredObject();
+            throw new NullReferenceException("The postalCode must be indicated in the address! ");
         }
-
         if (postalCode.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The postalCode must be filled in the address! ");
         }
-
         this.postalCode = postalCode;
     }
 
@@ -163,8 +155,8 @@ public class Address extends Entity {
         return orders;
     }
 
-    public void setOrders(Set<Order> orders) {
-        this.orders = orders;
+    public void setOrders(Order... orders) {
+        this.orders.addAll(Arrays.asList(orders));
     }
 
     @Override

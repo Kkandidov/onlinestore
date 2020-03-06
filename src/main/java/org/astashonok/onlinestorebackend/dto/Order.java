@@ -2,10 +2,11 @@ package org.astashonok.onlinestorebackend.dto;
 
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NegativeValueException;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NotPositiveValue;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceToRequiredObject;
+import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Order extends Entity {
@@ -19,9 +20,11 @@ public class Order extends Entity {
     private Set<OrderItem> orderItems;
 
     public Order() {
+        this.orderItems = new HashSet<>();
     }
 
     public Order(User user, double total, int count, Address shipping, Address billing, Date date) {
+        this();
         this.user = user;
         this.total = total;
         this.count = count;
@@ -39,11 +42,10 @@ public class Order extends Entity {
         return user;
     }
 
-    public void setUser(User user) throws NullReferenceToRequiredObject {
+    public void setUser(User user) throws NullReferenceException {
         if (user == null) {
-            throw new NullReferenceToRequiredObject("The order can't exist without a user ");
+            throw new NullReferenceException("The order can't exist without a user! ");
         }
-
         this.user = user;
     }
 
@@ -53,9 +55,8 @@ public class Order extends Entity {
 
     public void setTotal(double total) throws NegativeValueException {
         if (total < 0) {
-            throw new NegativeValueException();
+            throw new NegativeValueException("The total must be from 0! ");
         }
-
         this.total = total;
     }
 
@@ -63,11 +64,10 @@ public class Order extends Entity {
         return count;
     }
 
-    public void setCount(int count) throws NotPositiveValue {
-        if (count < 1) {
-            throw new NotPositiveValue("The product count has to have positive value! ");
+    public void setCount(int count) throws NegativeValueException {
+        if (count < 0) {
+            throw new NegativeValueException("The product count must be from 0! ");
         }
-
         this.count = count;
     }
 
@@ -75,11 +75,10 @@ public class Order extends Entity {
         return shipping;
     }
 
-    public void setShipping(Address shipping) throws NullReferenceToRequiredObject {
+    public void setShipping(Address shipping) throws NullReferenceException {
         if (shipping == null) {
-            throw new NullReferenceToRequiredObject("Shipping address is required for order delivery ");
+            throw new NullReferenceException("Shipping address is required for order delivery! ");
         }
-
         this.shipping = shipping;
     }
 
@@ -87,11 +86,10 @@ public class Order extends Entity {
         return billing;
     }
 
-    public void setBilling(Address billing) throws NullReferenceToRequiredObject {
+    public void setBilling(Address billing) throws NullReferenceException {
         if (billing == null) {
-            throw new NullReferenceToRequiredObject("Billing address needs to verify the plastic card ");
+            throw new NullReferenceException("Billing address needs to verify the plastic card! ");
         }
-
         this.billing = billing;
     }
 
@@ -99,11 +97,10 @@ public class Order extends Entity {
         return date;
     }
 
-    public void setDate(Date date) throws NullReferenceToRequiredObject {
+    public void setDate(Date date) throws NullReferenceException {
         if (date == null) {
-            throw new NullReferenceToRequiredObject("The order has to be placed on a specific date ");
+            throw new NullReferenceException("The order must be placed on a specific date! ");
         }
-
         this.date = date;
     }
 
@@ -111,12 +108,11 @@ public class Order extends Entity {
         return orderItems;
     }
 
-    public void setOrderItems(Set<OrderItem> orderItems) throws NullReferenceToRequiredObject {
-        if (orderItems == null) {
-            throw new NullReferenceToRequiredObject("Order can' be empty ");
+    public void setOrderItems(OrderItem...array) throws NullReferenceException {
+        if (array == null) {
+            throw new NullReferenceException("Order can' be empty! ");
         }
-
-        this.orderItems = orderItems;
+        this.orderItems.addAll(Arrays.asList(array));
     }
 
     @Override

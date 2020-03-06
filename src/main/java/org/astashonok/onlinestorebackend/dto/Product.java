@@ -4,9 +4,10 @@ import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NegativeValueException;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NotPositiveValue;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceToRequiredObject;
+import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Product extends Entity {
@@ -24,10 +25,14 @@ public class Product extends Entity {
     private Set<OrderItem> orderItems;
 
     public Product() {
+        this.views = new HashSet<>();
+        this.cartItems = new HashSet<>();
+        this.orderItems = new HashSet<>();
     }
 
     public Product(String name, String code, Brand brand, double unitPrice, int quantity, boolean active
-                   , Category category) {
+            , Category category) {
+        this();
         this.name = name;
         this.code = code;
         this.brand = brand;
@@ -49,13 +54,11 @@ public class Product extends Entity {
 
     public void setName(String name) throws OnlineStoreLogicalException {
         if (name == null) {
-            throw new NullReferenceToRequiredObject("The product has to have name ");
+            throw new NullReferenceException("The name must be indicated in the product! ");
         }
-
         if (name.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The name must be filled in the address! ");
         }
-
         this.name = name;
     }
 
@@ -65,13 +68,11 @@ public class Product extends Entity {
 
     public void setCode(String code) throws OnlineStoreLogicalException {
         if (code == null) {
-            throw new NullReferenceToRequiredObject("The product has to have code ");
+            throw new NullReferenceException("The name must be indicated in the product! ");
         }
-
         if (code.isEmpty()) {
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("The name must be filled in the address! ");
         }
-
         this.code = code;
     }
 
@@ -79,11 +80,10 @@ public class Product extends Entity {
         return brand;
     }
 
-    public void setBrand(Brand brand) throws NullReferenceToRequiredObject {
+    public void setBrand(Brand brand) throws NullReferenceException {
         if (brand == null) {
-            throw new NullReferenceToRequiredObject("The product has to have brand ");
+            throw new NullReferenceException("The brand must be indicated in the product! ");
         }
-
         this.brand = brand;
     }
 
@@ -93,9 +93,8 @@ public class Product extends Entity {
 
     public void setUnitPrice(double unitPrice) throws NegativeValueException {
         if (unitPrice < 0) {
-            throw new NegativeValueException("The price can't be negative ");
+            throw new NegativeValueException("The price must be from 0! ");
         }
-
         this.unitPrice = unitPrice;
     }
 
@@ -103,11 +102,10 @@ public class Product extends Entity {
         return quantity;
     }
 
-    public void setQuantity(int quantity) throws NotPositiveValue {
-        if (quantity < 1) {
-            throw new NotPositiveValue("The quantity has to have positive value! ");
+    public void setQuantity(int quantity) throws NegativeValueException {
+        if (quantity < 0) {
+            throw new NegativeValueException("The quantity must be from 0! ");
         }
-
         this.quantity = quantity;
     }
 
@@ -123,11 +121,10 @@ public class Product extends Entity {
         return category;
     }
 
-    public void setCategory(Category category) throws NullReferenceToRequiredObject {
+    public void setCategory(Category category) throws NullReferenceException {
         if (category == null) {
-            throw new NullReferenceToRequiredObject("The product has to have category ");
+            throw new NullReferenceException("The category must be indicated in the product! ");
         }
-
         this.category = category;
     }
 
@@ -135,11 +132,10 @@ public class Product extends Entity {
         return description;
     }
 
-    public void setDescription(Description description) throws NullReferenceToRequiredObject {
+    public void setDescription(Description description) throws NullReferenceException {
         if (description == null) {
-            throw new NullReferenceToRequiredObject("The product has to have description ");
+            throw new NullReferenceException("The description must be indicated in the product!");
         }
-
         this.description = description;
     }
 
@@ -147,24 +143,24 @@ public class Product extends Entity {
         return views;
     }
 
-    public void setViews(Set<View> views) {
-        this.views = views;
+    public void setViews(View... views) {
+        this.views.addAll(Arrays.asList(views));
     }
 
     public Set<CartItem> getCartItems() {
         return cartItems;
     }
 
-    public void setCartItems(Set<CartItem> cartItems) {
-        this.cartItems = cartItems;
+    public void setCartItems(CartItem... cartItems) {
+        this.cartItems.addAll(Arrays.asList(cartItems));
     }
 
     public Set<OrderItem> getOrderItems() {
         return orderItems;
     }
 
-    public void setOrderItems(Set<OrderItem> orderItems) {
-        this.orderItems = orderItems;
+    public void setOrderItems(OrderItem... orderItems) {
+        this.orderItems.addAll(Arrays.asList(orderItems));
     }
 
     @Override
