@@ -12,7 +12,7 @@ public interface CartItemDAO extends EntityDAO<CartItem> {
     // read
     List<CartItem> getByCart(Cart cart);
 
-    List<CartItem> getAvailableByCart();
+    List<CartItem> getAvailableByCart(Cart cart);
 
     List<CartItem> getByProduct(Product product);
 

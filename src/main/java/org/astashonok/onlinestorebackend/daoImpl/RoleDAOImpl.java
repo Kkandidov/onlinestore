@@ -1,16 +1,13 @@
-package org.astashonok.onlinestorebackend.dao.daoImpl;
+package org.astashonok.onlinestorebackend.daoImpl;
 
 import org.astashonok.onlinestorebackend.dao.RoleDAO;
 import org.astashonok.onlinestorebackend.dto.Role;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
-import org.astashonok.onlinestorebackend.util.Pool;
-import org.astashonok.onlinestorebackend.util.PoolWithDataSource;
-import org.astashonok.onlinestorebackend.util.Pools;
+import org.astashonok.onlinestorebackend.util.pool.Pool;
+import org.astashonok.onlinestorebackend.util.pool.PoolWithDataSource;
+import org.astashonok.onlinestorebackend.util.pool.Pools;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,26 +35,19 @@ public class RoleDAOImpl implements RoleDAO {
     public List<Role> getAll() {
         String sql = "SELECT id, name, active FROM roles";
         List<Role> roles = new ArrayList<>();
-        ResultSet resultSet = null;
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            resultSet = preparedStatement.executeQuery();
+        Role role;
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)
+             ; ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
-                Role role = new Role();
+                role = new Role();
                 role.setId(resultSet.getLong("id"));
                 role.setName(resultSet.getString("name"));
                 role.setActive(resultSet.getBoolean("active"));
                 roles.add(role);
             }
         } catch (SQLException | OnlineStoreLogicalException e) {
+            roles = null;
             e.printStackTrace();
-        }finally {
-            if(resultSet != null){
-                try {
-                    resultSet.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return roles;
     }
@@ -66,94 +56,90 @@ public class RoleDAOImpl implements RoleDAO {
     public List<Role> getAllActive() {
         String sql = "SELECT id, name, active FROM roles WHERE active = 1";
         List<Role> roles = new ArrayList<>();
-        ResultSet resultSet = null;
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            resultSet = preparedStatement.executeQuery();
+        Role role;
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)
+             ; ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
-                Role role = new Role();
+                role = new Role();
                 role.setId(resultSet.getLong("id"));
                 role.setName(resultSet.getString("name"));
                 role.setActive(resultSet.getBoolean("active"));
                 roles.add(role);
             }
         } catch (SQLException | OnlineStoreLogicalException e) {
+            roles = null;
             e.printStackTrace();
-        }finally {
-            if(resultSet != null){
-                try {
-                    resultSet.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return roles;
     }
 
     @Override
     public Role getByName(String name) {
-        String sql = "SELECT id, name, active FROM roles WHERE name = ?";
+        String sql = "SELECT id, name, active FROM roles WHERE name = '" + name + "'";
         Role role = null;
-        ResultSet resultSet = null;
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, name);
-            resultSet = preparedStatement.executeQuery();
-            resultSet.next();
-            role = new Role();
-            role.setId(resultSet.getLong("id"));
-            role.setName(resultSet.getString("name"));
-            role.setActive(resultSet.getBoolean("active"));
-        } catch (SQLException | OnlineStoreLogicalException e) {
-            e.printStackTrace();
-        }finally {
-            if(resultSet != null){
-                try {
-                    resultSet.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)
+             ; ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                role = new Role();
+                role.setId(resultSet.getLong("id"));
+                role.setName(resultSet.getString("name"));
+                role.setActive(resultSet.getBoolean("active"));
             }
+        } catch (SQLException | OnlineStoreLogicalException e) {
+            role = null;
+            e.printStackTrace();
         }
         return role;
     }
 
     @Override
-    public boolean add(Role entity) {
+    public long add(Role entity) {
         String sql = "INSERT INTO roles (name, active) VALUES (?, ?)";
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        long id = 0;
+        ResultSet generatedKeys = null;
+        try (Connection connection = getConnection()
+             ; PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, entity.getName());
             preparedStatement.setBoolean(2, entity.isActive());
-            preparedStatement.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    @Override
-    public Role getById(long id) {
-        String sql = "SELECT id, name, active FROM roles WHERE id = ?";
-        Role role = null;
-        ResultSet resultSet = null;
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, id);
-            resultSet = preparedStatement.executeQuery();
-            resultSet.next();
-            role = new Role();
-            role.setId(resultSet.getLong("id"));
-            role.setName(resultSet.getString("name"));
-            role.setActive(resultSet.getBoolean("active"));
+            if (preparedStatement.executeUpdate() == 0) {
+                throw new SQLException("Creating address is failed, no rows is affected! ");
+            }
+            generatedKeys = preparedStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                id = generatedKeys.getLong(1);
+                entity.setId(id);
+            } else {
+                throw new SQLException("Creating address is failed, no id is obtained! ");
+            }
         } catch (SQLException | OnlineStoreLogicalException e) {
             e.printStackTrace();
-        }finally {
-            if(resultSet != null){
+        } finally {
+            if (generatedKeys != null){
                 try {
-                    resultSet.close();
+                    generatedKeys.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
+        }
+        return id;
+    }
+
+    @Override
+    public Role getById(long id) {
+        String sql = "SELECT id, name, active FROM roles WHERE id = " + id;
+        Role role = null;
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)
+             ; ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                role = new Role();
+                role.setId(resultSet.getLong("id"));
+                role.setName(resultSet.getString("name"));
+                role.setActive(resultSet.getBoolean("active"));
+            }
+        } catch (SQLException | OnlineStoreLogicalException e) {
+            role = null;
+            e.printStackTrace();
         }
         return role;
     }
@@ -164,8 +150,10 @@ public class RoleDAOImpl implements RoleDAO {
         try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(3, entity.getId());
             preparedStatement.setString(1, entity.getName());
-              preparedStatement.setBoolean(2, entity.isActive());
-            preparedStatement.executeUpdate();
+            preparedStatement.setBoolean(2, entity.isActive());
+            if (preparedStatement.executeUpdate() == 0) {
+                throw new SQLException("Creating role is failed, no rows is affected! ");
+            }
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -177,5 +165,21 @@ public class RoleDAOImpl implements RoleDAO {
     public boolean remove(Role entity) {
         entity.setActive(false);
         return edit(entity);
+    }
+
+
+    public static Role getRoleById(long id, Connection connection, PreparedStatement preparedStatement
+            , ResultSet resultSet) throws SQLException, OnlineStoreLogicalException {
+        String sql = "SELECT id, name, active FROM roles WHERE id = " + id;
+        Role role = null;
+        preparedStatement = connection.prepareStatement(sql);
+        resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            role = new Role();
+            role.setId(resultSet.getLong("id"));
+            role.setName(resultSet.getString("name"));
+            role.setActive(resultSet.getBoolean("active"));
+        }
+        return role;
     }
 }

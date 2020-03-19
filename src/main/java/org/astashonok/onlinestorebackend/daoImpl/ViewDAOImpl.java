@@ -1,21 +1,18 @@
-package org.astashonok.onlinestorebackend.dao.daoImpl;
+package org.astashonok.onlinestorebackend.daoImpl;
 
 import org.astashonok.onlinestorebackend.dao.ViewDAO;
-import org.astashonok.onlinestorebackend.dto.Brand;
-import org.astashonok.onlinestorebackend.dto.Category;
 import org.astashonok.onlinestorebackend.dto.Product;
 import org.astashonok.onlinestorebackend.dto.View;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
-import org.astashonok.onlinestorebackend.util.Pool;
-import org.astashonok.onlinestorebackend.util.PoolWithDataSource;
-import org.astashonok.onlinestorebackend.util.Pools;
+import org.astashonok.onlinestorebackend.util.pool.Pool;
+import org.astashonok.onlinestorebackend.util.pool.PoolWithDataSource;
+import org.astashonok.onlinestorebackend.util.pool.Pools;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.astashonok.onlinestorebackend.daoImpl.ProductDAOImpl.getProductById;
 
 public class ViewDAOImpl implements ViewDAO {
 
@@ -40,8 +37,8 @@ public class ViewDAOImpl implements ViewDAO {
     @Override
     public List<View> getByProduct(Product product) {
         String sql = "SELECT id, code, product_id FROM views WHERE product_id = " + product.getId();
-        List<View> views = new ArrayList<>();
         View view;
+        List<View> views = new ArrayList<>();
         try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql);
              ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
@@ -52,36 +49,49 @@ public class ViewDAOImpl implements ViewDAO {
                 views.add(view);
             }
         } catch (SQLException | OnlineStoreLogicalException e) {
+            views = null;
             e.printStackTrace();
         }
         return views;
     }
 
     @Override
-    public boolean add(View entity) {
+    public long add(View entity) {
         String sql = "INSERT INTO views (code, product_id) VALUES(?, ?)";
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        long id = 0;
+        ResultSet generatedKeys = null;
+        try (Connection connection = getConnection()
+             ; PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, entity.getCode());
             preparedStatement.setLong(2, entity.getProduct().getId());
-            preparedStatement.executeUpdate();
-            return true;
-        } catch (SQLException e) {
+            if (preparedStatement.executeUpdate() == 0) {
+                throw new SQLException("Creating address is failed, no rows is affected! ");
+            }
+            generatedKeys = preparedStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                id = generatedKeys.getLong(1);
+                entity.setId(id);
+            } else {
+                throw new SQLException("Creating address is failed, no id is obtained! ");
+            }
+        } catch (SQLException | OnlineStoreLogicalException e) {
             e.printStackTrace();
+        } finally {
+            if (generatedKeys != null){
+                try {
+                    generatedKeys.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        return false;
+        return id;
     }
 
     @Override
     public View getById(long id) {
         String sqlForView = "SELECT id, code, product_id FROM views WHERE id = " + id;
-        String sqlForProduct = "SELECT id, name, code, brand_id, unit_price, quantity, active, category_id "
-                + "FROM products WHERE id = ?";
-        String sqlForBrand = "SELECT id, name, description, active FROM brands WHERE id = ?";
-        String sqlForCategory = "SELECT id, name, active FROM categories WHERE id = ?";
         View view = null;
-        Product product;
-        Brand brand;
-        Category category;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try (Connection connection = getConnection()) {
@@ -95,49 +105,10 @@ public class ViewDAOImpl implements ViewDAO {
                     view.setId(resultSet.getLong("id"));
                     view.setCode(resultSet.getString("code"));
                     long productId = resultSet.getLong("product_id");
-
-                    preparedStatement = connection.prepareStatement(sqlForProduct);
-                    preparedStatement.setLong(1, productId);
-                    resultSet = preparedStatement.executeQuery();
-                    if (resultSet.next()) {
-                        product = new Product();
-                        product.setId(resultSet.getLong("id"));
-                        product.setName(resultSet.getString("name"));
-                        product.setCode(resultSet.getString("code"));
-                        product.setUnitPrice(resultSet.getDouble("unit_price"));
-                        product.setQuantity(resultSet.getInt("quantity"));
-                        product.setActive(resultSet.getBoolean("active"));
-                        long brandId = resultSet.getLong("brand_id");
-                        long categoryId = resultSet.getLong("category_id");
-
-                        preparedStatement = connection.prepareStatement(sqlForBrand);
-                        preparedStatement.setLong(1, brandId);
-                        resultSet = preparedStatement.executeQuery();
-                        if(resultSet.next()){
-                            brand = new Brand();
-                            brand.setId(resultSet.getLong("id"));
-                            brand.setName(resultSet.getString("name"));
-                            brand.setDescription(resultSet.getString("description"));
-                            brand.setActive(resultSet.getBoolean("active"));
-
-                            preparedStatement = connection.prepareStatement(sqlForCategory);
-                            preparedStatement.setLong(1, categoryId);
-                            resultSet = preparedStatement.executeQuery();
-                            if (resultSet.next()) {
-                                category = new Category();
-                                category.setId(resultSet.getLong("id"));
-                                category.setName(resultSet.getString("name"));
-                                category.setActive(resultSet.getBoolean("active"));
-
-                                product.setCategory(category);
-                                product.setBrand(brand);
-                                view.setProduct(product);
-                                connection.commit();
-                            }
-                        }
-                    }
+                    view.setProduct(getProductById(productId, connection, preparedStatement, resultSet));
                 }
             } catch (SQLException | OnlineStoreLogicalException e) {
+                view = null;
                 connection.rollback();
                 e.printStackTrace();
             } finally {
@@ -161,7 +132,9 @@ public class ViewDAOImpl implements ViewDAO {
             preparedStatement.setLong(3, entity.getId());
             preparedStatement.setString(1, entity.getCode());
             preparedStatement.setLong(2, entity.getProduct().getId());
-            preparedStatement.executeUpdate();
+            if (preparedStatement.executeUpdate() == 0) {
+                throw new SQLException("Creating view is failed, no rows is affected! ");
+            }
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -172,12 +145,31 @@ public class ViewDAOImpl implements ViewDAO {
     @Override
     public boolean remove(View entity) {
         String sql = "DELETE FROM views WHERE id = " + entity.getId();
-        try(Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)){
-            preparedStatement.executeUpdate();
+        try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+            if (statement.executeUpdate(sql) == 0) {
+                throw new SQLException("Deleting views is failed, no rows is affected! ");
+            }
             return true;
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
+    }
+
+
+    public static View getViewById(long id, Connection connection, PreparedStatement preparedStatement
+            , ResultSet resultSet) throws SQLException, OnlineStoreLogicalException {
+        String sql = "SELECT id, code, product_id FROM views WHERE id = " + id;
+        View view = null;
+        preparedStatement = connection.prepareStatement(sql);
+        resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            view = new View();
+            view.setId(resultSet.getLong("id"));
+            view.setCode(resultSet.getString("code"));
+            long productId = resultSet.getLong("product_id");
+            view.setProduct(getProductById(productId, connection, preparedStatement, resultSet));
+        }
+        return view;
     }
 }

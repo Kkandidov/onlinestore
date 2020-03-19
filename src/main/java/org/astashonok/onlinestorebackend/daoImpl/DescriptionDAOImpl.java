@@ -1,19 +1,16 @@
-package org.astashonok.onlinestorebackend.dao.daoImpl;
+package org.astashonok.onlinestorebackend.daoImpl;
 
 import org.astashonok.onlinestorebackend.dao.DescriptionDAO;
-import org.astashonok.onlinestorebackend.dto.Brand;
-import org.astashonok.onlinestorebackend.dto.Category;
 import org.astashonok.onlinestorebackend.dto.Description;
 import org.astashonok.onlinestorebackend.dto.Product;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
-import org.astashonok.onlinestorebackend.util.Pool;
-import org.astashonok.onlinestorebackend.util.PoolWithDataSource;
-import org.astashonok.onlinestorebackend.util.Pools;
+import org.astashonok.onlinestorebackend.util.pool.Pool;
+import org.astashonok.onlinestorebackend.util.pool.PoolWithDataSource;
+import org.astashonok.onlinestorebackend.util.pool.Pools;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+
+import static org.astashonok.onlinestorebackend.daoImpl.ProductDAOImpl.getProductById;
 
 public class DescriptionDAOImpl implements DescriptionDAO {
 
@@ -40,8 +37,9 @@ public class DescriptionDAOImpl implements DescriptionDAO {
         String sql = "SELECT id, screen, color, processor, front_camera, rear_camera, capacity, battery"
                 + ", display_technology, graphics, wireless_communication FROM descriptions WHERE id = " + product.getId();
         Description description = null;
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (Connection connection = getConnection()
+             ; PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+             ; ResultSet resultSet = preparedStatement.executeQuery()) {
             if (resultSet.next()) {
                 description = new Description();
                 description.setProduct(product);
@@ -57,30 +55,23 @@ public class DescriptionDAOImpl implements DescriptionDAO {
                 description.setWirelessCommunication(resultSet.getString("wireless_communication"));
             }
         } catch (SQLException | OnlineStoreLogicalException e) {
+            description = null;
             e.printStackTrace();
         }
         return description;
     }
 
     @Override
-    public boolean add(Description entity) {
+    public long add(Description entity) {
         // ignore
-        // A product description is added automatically when product is created
-        return false;
+        throw new IllegalStateException("A product description is added automatically when product is created");
     }
 
     @Override
     public Description getById(long id) {
         String sqlForDescription = "SELECT id, screen, color, processor, front_camera, rear_camera, capacity, battery"
                 + ", display_technology, graphics, wireless_communication FROM descriptions WHERE id = " + id;
-        String sqlForProduct = "SELECT id, name, code, brand_id, unit_price, quantity, active, category_id "
-                + "FROM products WHERE id = " + id;
-        String sqlForBrand = "SELECT id, name, description, active FROM brands WHERE id = ?";
-        String sqlForCategory = "SELECT id, name, active FROM categories WHERE id = ?";
         Description description = null;
-        Product product;
-        Brand brand;
-        Category category;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try (Connection connection = getConnection()) {
@@ -101,46 +92,11 @@ public class DescriptionDAOImpl implements DescriptionDAO {
                     description.setDisplayTechnology(resultSet.getString("display_technology"));
                     description.setGraphics(resultSet.getString("graphics"));
                     description.setWirelessCommunication(resultSet.getString("wireless_communication"));
-                    preparedStatement = connection.prepareStatement(sqlForProduct);
-                    resultSet = preparedStatement.executeQuery();
-                    if (resultSet.next()) {
-                        product = new Product();
-                        product.setId(resultSet.getLong("id"));
-                        product.setName(resultSet.getString("name"));
-                        product.setCode(resultSet.getString("code"));
-                        product.setUnitPrice(resultSet.getDouble("unit_price"));
-                        product.setQuantity(resultSet.getInt("quantity"));
-                        product.setActive(resultSet.getBoolean("active"));
-                        long brandId = resultSet.getLong("brand_id");
-                        long categoryId = resultSet.getLong("category_id");
-                        preparedStatement = connection.prepareStatement(sqlForBrand);
-                        preparedStatement.setLong(1, brandId);
-                        resultSet = preparedStatement.executeQuery();
-                        if (resultSet.next()) {
-                            brand = new Brand();
-                            brand.setId(resultSet.getLong("id"));
-                            brand.setName(resultSet.getString("name"));
-                            brand.setDescription(resultSet.getString("description"));
-                            brand.setActive(resultSet.getBoolean("active"));
-
-                            preparedStatement = connection.prepareStatement(sqlForCategory);
-                            preparedStatement.setLong(1, categoryId);
-                            resultSet = preparedStatement.executeQuery();
-                            if (resultSet.next()) {
-                                category = new Category();
-                                category.setId(resultSet.getLong("id"));
-                                category.setName(resultSet.getString("name"));
-                                category.setActive(resultSet.getBoolean("active"));
-                                product.setCategory(category);
-                                product.setBrand(brand);
-                                description.setProduct(product);
-                                connection.commit();
-                                return description;
-                            }
-                        }
-                    }
+                    description.setProduct(getProductById(id, connection, preparedStatement, resultSet));
+                    connection.commit();
                 }
             } catch (SQLException | OnlineStoreLogicalException e) {
+                description = null;
                 connection.rollback();
                 e.printStackTrace();
             } finally {
@@ -174,7 +130,9 @@ public class DescriptionDAOImpl implements DescriptionDAO {
             preparedStatement.setString(8, entity.getDisplayTechnology());
             preparedStatement.setString(9, entity.getGraphics());
             preparedStatement.setString(10, entity.getWirelessCommunication());
-            preparedStatement.executeUpdate();
+            if (preparedStatement.executeUpdate() == 0) {
+                throw new SQLException("Creating description is failed, no rows is affected! ");
+            }
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -185,7 +143,31 @@ public class DescriptionDAOImpl implements DescriptionDAO {
     @Override
     public boolean remove(Description entity) {
         //ignore
-        // A product description is deleted automatically when product is deleted
-        return false;
+        throw new IllegalStateException("A product description is deleted automatically when product is deleted");
+    }
+
+
+    public static Description getDescriptionById(long id, Connection connection, PreparedStatement preparedStatement
+            , ResultSet resultSet) throws SQLException, OnlineStoreLogicalException {
+        String sql = "SELECT id, screen, color, processor, front_camera, rear_camera, capacity, battery"
+                + ", display_technology, graphics, wireless_communication FROM descriptions WHERE id = " + id;
+        Description description = null;
+        preparedStatement = connection.prepareStatement(sql);
+        resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            description = new Description();
+            description.setScreen(resultSet.getString("screen"));
+            description.setColor(resultSet.getString("color"));
+            description.setProcessor(resultSet.getString("processor"));
+            description.setFrontCamera(resultSet.getString("front_camera"));
+            description.setRearCamera(resultSet.getString("rear_camera"));
+            description.setCapacity(resultSet.getString("capacity"));
+            description.setBattery(resultSet.getString("battery"));
+            description.setDisplayTechnology(resultSet.getString("display_technology"));
+            description.setGraphics(resultSet.getString("graphics"));
+            description.setWirelessCommunication(resultSet.getString("wireless_communication"));
+            description.setProduct(getProductById(id, connection, preparedStatement, resultSet));
+        }
+        return description;
     }
 }

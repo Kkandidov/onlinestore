@@ -1,16 +1,13 @@
-package org.astashonok.onlinestorebackend.dao.daoImpl;
+package org.astashonok.onlinestorebackend.daoImpl;
 
 import org.astashonok.onlinestorebackend.dao.CategoryDAO;
 import org.astashonok.onlinestorebackend.dto.Category;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
-import org.astashonok.onlinestorebackend.util.Pool;
-import org.astashonok.onlinestorebackend.util.PoolWithDataSource;
-import org.astashonok.onlinestorebackend.util.Pools;
+import org.astashonok.onlinestorebackend.util.pool.Pool;
+import org.astashonok.onlinestorebackend.util.pool.PoolWithDataSource;
+import org.astashonok.onlinestorebackend.util.pool.Pools;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,26 +35,19 @@ public class CategoryDAOImpl implements CategoryDAO {
     public List<Category> getAll() {
         String sql = "SELECT id, name, active FROM categories";
         List<Category> categories = new ArrayList<>();
-        ResultSet resultSet = null;
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            resultSet = preparedStatement.executeQuery();
+        Category category;
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)
+             ; ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
-                Category category = new Category();
+                category = new Category();
                 category.setId(resultSet.getLong("id"));
                 category.setName(resultSet.getString("name"));
                 category.setActive(resultSet.getBoolean("active"));
                 categories.add(category);
             }
         } catch (SQLException | OnlineStoreLogicalException e) {
+            categories = null;
             e.printStackTrace();
-        }finally {
-            if(resultSet != null){
-                try {
-                    resultSet.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return categories;
     }
@@ -67,38 +57,29 @@ public class CategoryDAOImpl implements CategoryDAO {
     public List<Category> getAllActive() {
         String sql = "SELECT id, name, active FROM categories WHERE active = 1";
         List<Category> categories = new ArrayList<>();
-        ResultSet resultSet = null;
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            resultSet = preparedStatement.executeQuery();
+        Category category;
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)
+             ; ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
-                Category category = new Category();
+                category = new Category();
                 category.setId(resultSet.getLong("id"));
                 category.setName(resultSet.getString("name"));
                 category.setActive(resultSet.getBoolean("active"));
                 categories.add(category);
             }
         } catch (SQLException | OnlineStoreLogicalException e) {
+            categories = null;
             e.printStackTrace();
-        }finally {
-            if(resultSet != null){
-                try {
-                    resultSet.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return categories;
     }
 
     @Override
     public Category getByName(String name) {
-        String sql = "SELECT id, name, active FROM categories WHERE name = ?";
+        String sql = "SELECT id, name, active FROM categories WHERE name = '" + name + "'";
         Category category = null;
-        ResultSet resultSet = null;
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, name);
-            resultSet = preparedStatement.executeQuery();
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)
+             ; ResultSet resultSet = preparedStatement.executeQuery()) {
             if (resultSet.next()) {
                 category = new Category();
                 category.setId(resultSet.getLong("id"));
@@ -106,41 +87,51 @@ public class CategoryDAOImpl implements CategoryDAO {
                 category.setActive(resultSet.getBoolean("active"));
             }
         } catch (SQLException | OnlineStoreLogicalException e) {
+            category = null;
             e.printStackTrace();
-        }finally {
-            if(resultSet != null){
-                try {
-                    resultSet.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return category;
     }
 
     @Override
-    public boolean add(Category entity) {
+    public long add(Category entity) {
         String sql = "INSERT INTO categories (name, active) VALUES (?, ?)";
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        long id = 0;
+        ResultSet generatedKeys = null;
+        try (Connection connection = getConnection()
+             ; PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, entity.getName());
             preparedStatement.setBoolean(2, entity.isActive());
-            preparedStatement.executeUpdate();
-            return true;
-        } catch (SQLException e) {
+            if (preparedStatement.executeUpdate() == 0) {
+                throw new SQLException("Creating category is failed, no rows is affected! ");
+            }
+            generatedKeys = preparedStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                id = generatedKeys.getLong(1);
+                entity.setId(id);
+            } else {
+                throw new SQLException("Creating category is failed, no id is obtained! ");
+            }
+        } catch (SQLException | OnlineStoreLogicalException e) {
             e.printStackTrace();
+        } finally {
+            if (generatedKeys != null) {
+                try {
+                    generatedKeys.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        return false;
+        return id;
     }
 
     @Override
     public Category getById(long id) {
-        String sql = "SELECT id, name, active FROM categories WHERE id = ?";
+        String sql = "SELECT id, name, active FROM categories WHERE id = " + id;
         Category category = null;
-        ResultSet resultSet = null;
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, id);
-            resultSet = preparedStatement.executeQuery();
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)
+             ; ResultSet resultSet = preparedStatement.executeQuery()) {
             if (resultSet.next()) {
                 category = new Category();
                 category.setId(resultSet.getLong("id"));
@@ -148,15 +139,8 @@ public class CategoryDAOImpl implements CategoryDAO {
                 category.setActive(resultSet.getBoolean("active"));
             }
         } catch (SQLException | OnlineStoreLogicalException e) {
+            category = null;
             e.printStackTrace();
-        }finally {
-            if(resultSet != null){
-                try {
-                    resultSet.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return category;
     }
@@ -168,7 +152,9 @@ public class CategoryDAOImpl implements CategoryDAO {
             preparedStatement.setLong(3, entity.getId());
             preparedStatement.setString(1, entity.getName());
             preparedStatement.setBoolean(2, entity.isActive());
-            preparedStatement.executeUpdate();
+            if (preparedStatement.executeUpdate() == 0) {
+                throw new SQLException("Creating category is failed, no rows is affected! ");
+            }
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -180,5 +166,20 @@ public class CategoryDAOImpl implements CategoryDAO {
     public boolean remove(Category entity) {
         entity.setActive(false);
         return edit(entity);
+    }
+
+    public static Category getCategoryById(long id, Connection connection, PreparedStatement preparedStatement
+            , ResultSet resultSet) throws SQLException, OnlineStoreLogicalException {
+        String sql = "SELECT id, name, active FROM categories WHERE id = " + id;
+        Category category = null;
+        preparedStatement = connection.prepareStatement(sql);
+        resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            category = new Category();
+            category.setId(resultSet.getLong("id"));
+            category.setName(resultSet.getString("name"));
+            category.setActive(resultSet.getBoolean("active"));
+        }
+        return category;
     }
 }

@@ -14,6 +14,6 @@ public interface OrderItemDAO extends EntityDAO<OrderItem> {
 
     List<OrderItem> getByProduct(Product product);
 
-    OrderItem getByOrderAndProduct(OrderItem orderItem, Product product);
+    OrderItem getByOrderAndProduct(Order order, Product product);
 
 }

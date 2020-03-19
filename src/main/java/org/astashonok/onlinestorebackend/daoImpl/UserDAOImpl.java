@@ -1,18 +1,18 @@
-package org.astashonok.onlinestorebackend.dao.daoImpl;
+package org.astashonok.onlinestorebackend.daoImpl;
 
 import org.astashonok.onlinestorebackend.dao.UserDAO;
 import org.astashonok.onlinestorebackend.dto.Role;
 import org.astashonok.onlinestorebackend.dto.User;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
-import org.astashonok.onlinestorebackend.util.Pool;
-import org.astashonok.onlinestorebackend.util.PoolWithDataSource;
-import org.astashonok.onlinestorebackend.util.Pools;
+import org.astashonok.onlinestorebackend.util.pool.Pool;
+import org.astashonok.onlinestorebackend.util.pool.PoolWithDataSource;
+import org.astashonok.onlinestorebackend.util.pool.Pools;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static org.astashonok.onlinestorebackend.daoImpl.RoleDAOImpl.getRoleById;
 
 public class UserDAOImpl implements UserDAO {
 
@@ -36,19 +36,16 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public User getByEmail(String email) {
-        String sqlForUser = "SELECT id, first_name, last_name, email, password, contact_number, enabled, role_id FROM users"
-                + " WHERE email = ?";
-        String sqlForRole = "SELECT id, name, active FROM roles WHERE id = ?";
-        User user;
-        Role role;
+        String sql = "SELECT id, first_name, last_name, email, password, contact_number, enabled, role_id FROM users"
+                + " WHERE email = '" + email + "'";
+        User user = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try (Connection connection = getConnection()) {
             //transaction execution
             connection.setAutoCommit(false);
             try {
-                preparedStatement = connection.prepareStatement(sqlForUser);
-                preparedStatement.setString(1, email);
+                preparedStatement = connection.prepareStatement(sql);
                 resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
                     user = new User();
@@ -59,22 +56,12 @@ public class UserDAOImpl implements UserDAO {
                     user.setPassword(resultSet.getString("password"));
                     user.setContactNumber(resultSet.getString("contact_number"));
                     user.setEnabled(resultSet.getBoolean("enabled"));
-
                     long roleId = resultSet.getLong("role_id");
-                    preparedStatement = connection.prepareStatement(sqlForRole);
-                    preparedStatement.setLong(1, roleId);
-                    resultSet = preparedStatement.executeQuery();
-                    if (resultSet.next()) {
-                        role = new Role();
-                        role.setId(resultSet.getLong("id"));
-                        role.setName(resultSet.getString("name"));
-                        role.setActive(resultSet.getBoolean("active"));
-                        user.setRole(role);
-                        connection.commit();
-                        return user;
-                    }
+                    user.setRole(getRoleById(roleId, connection, preparedStatement, resultSet));
+                    connection.commit();
                 }
             } catch (SQLException | OnlineStoreLogicalException e) {
+                user = null;
                 connection.rollback();
                 e.printStackTrace();
             } finally {
@@ -88,24 +75,21 @@ public class UserDAOImpl implements UserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return user;
     }
 
     @Override
     public List<User> getAll() {
-        String sqlForUser = "SELECT id, first_name, last_name, email, password, contact_number, enabled, role_id FROM users";
-        String sqlForRole = "SELECT id, name, active FROM roles WHERE id = ?";
+        String sql = "SELECT id, first_name, last_name, email, password, contact_number, enabled, role_id FROM users";
         List<User> users = new ArrayList<>();
-        Map<User, Long> userHashMap = new HashMap<>();
         User user;
-        Role role;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try (Connection connection = getConnection()) {
             //transaction execution
             connection.setAutoCommit(false);
             try {
-                preparedStatement = connection.prepareStatement(sqlForUser);
+                preparedStatement = connection.prepareStatement(sql);
                 resultSet = preparedStatement.executeQuery();
                 while (resultSet.next()) {
                     user = new User();
@@ -115,27 +99,14 @@ public class UserDAOImpl implements UserDAO {
                     user.setEmail(resultSet.getString("email"));
                     user.setPassword(resultSet.getString("password"));
                     user.setContactNumber(resultSet.getString("contact_number"));
-                    Long roleId = resultSet.getLong("role_id");
+                    long roleId = resultSet.getLong("role_id");
                     user.setEnabled(resultSet.getBoolean("enabled"));
-                    userHashMap.put(user, roleId);
-                }
-                preparedStatement = connection.prepareStatement(sqlForRole);
-                for (Map.Entry<User, Long> entry : userHashMap.entrySet()) {
-                    preparedStatement.setLong(1, entry.getValue());
-                    resultSet = preparedStatement.executeQuery();
-                    if (resultSet.next()) {
-                        role = new Role();
-                        role.setId(resultSet.getLong("id"));
-                        role.setName(resultSet.getString("name"));
-                        role.setActive(resultSet.getBoolean("active"));
-                        user = entry.getKey();
-                        user.setRole(role);
-                        users.add(user);
-                    }
+                    user.setRole(getRoleById(roleId, connection, preparedStatement, resultSet));
+                    users.add(user);
                 }
                 connection.commit();
-                return users;
             } catch (SQLException | OnlineStoreLogicalException e) {
+                users = null;
                 connection.rollback();
                 e.printStackTrace();
             } finally {
@@ -149,25 +120,22 @@ public class UserDAOImpl implements UserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return users;
     }
 
     @Override
     public List<User> getAllEnable() {
-        String sqlForUser = "SELECT id, first_name, last_name, email, password, contact_number, enabled, role_id FROM "
+        String sql = "SELECT id, first_name, last_name, email, password, contact_number, enabled, role_id FROM "
                 + "users WHERE enabled = 1";
-        String sqlForRole = "SELECT id, name, active FROM roles WHERE id = ?";
         List<User> users = new ArrayList<>();
-        Map<User, Long> userHashMap = new HashMap<>();
         User user;
-        Role role;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try (Connection connection = getConnection()) {
             //transaction execution
             connection.setAutoCommit(false);
             try {
-                preparedStatement = connection.prepareStatement(sqlForUser);
+                preparedStatement = connection.prepareStatement(sql);
                 resultSet = preparedStatement.executeQuery();
                 while (resultSet.next()) {
                     user = new User();
@@ -177,27 +145,14 @@ public class UserDAOImpl implements UserDAO {
                     user.setEmail(resultSet.getString("email"));
                     user.setPassword(resultSet.getString("password"));
                     user.setContactNumber(resultSet.getString("contact_number"));
-                    Long roleId = resultSet.getLong("role_id");
+                    long roleId = resultSet.getLong("role_id");
                     user.setEnabled(resultSet.getBoolean("enabled"));
-                    userHashMap.put(user, roleId);
-                }
-                preparedStatement = connection.prepareStatement(sqlForRole);
-                for (Map.Entry<User, Long> entry : userHashMap.entrySet()) {
-                    preparedStatement.setLong(1, entry.getValue());
-                    resultSet = preparedStatement.executeQuery();
-                    if (resultSet.next()) {
-                        role = new Role();
-                        role.setId(resultSet.getLong("id"));
-                        role.setName(resultSet.getString("name"));
-                        role.setActive(resultSet.getBoolean("active"));
-                        user = entry.getKey();
-                        user.setRole(role);
-                        users.add(user);
-                    }
+                    user.setRole(getRoleById(roleId, connection, preparedStatement, resultSet));
+                    users.add(user);
                 }
                 connection.commit();
-                return users;
             } catch (SQLException | OnlineStoreLogicalException e) {
+                users = null;
                 connection.rollback();
                 e.printStackTrace();
             } finally {
@@ -211,19 +166,17 @@ public class UserDAOImpl implements UserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return users;
     }
 
     @Override
     public List<User> getByRole(Role role) {
         String sql = "SELECT id, first_name, last_name, email, password, contact_number, enabled, role_id FROM users"
-                + " WHERE role_id = ?";
+                + " WHERE role_id = " + role.getId();
         List<User> users = new ArrayList<>();
         User user;
-        ResultSet resultSet = null;
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, role.getId());
-            resultSet = preparedStatement.executeQuery();
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)
+             ; ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
                 user = new User();
                 user.setId(resultSet.getLong("id"));
@@ -236,34 +189,26 @@ public class UserDAOImpl implements UserDAO {
                 user.setRole(role);
                 users.add(user);
             }
-            return users;
         } catch (SQLException | OnlineStoreLogicalException e) {
+            users = null;
             e.printStackTrace();
-        } finally {
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
-        return null;
+        return users;
     }
 
     @Override
-    public boolean add(User entity) {
-        String sqlForUserCreation = "INSERT INTO users (first_name, last_name, email, password, contact_number, enabled, role_id)"
+    public long add(User entity) {
+        String sql = "INSERT INTO users (first_name, last_name, email, password, contact_number, enabled, role_id)"
                 + " VALUES(?, ?, ?, ?, ?, ?, ?)";
-        String sqlForUserFetching = "SELECT id, first_name, last_name, email, password, contact_number, enabled, role_id FROM users"
-                + " WHERE email = '" + entity.getEmail() + "';";
+        long id = 0;
+        long userId;
         PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
+        ResultSet generatedKeys = null;
         try (Connection connection = getConnection()) {
             //transaction execution
             connection.setAutoCommit(false);
             try {
-                preparedStatement = connection.prepareStatement(sqlForUserCreation);
+                preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 preparedStatement.setString(1, entity.getFirstName());
                 preparedStatement.setString(2, entity.getLastName());
                 preparedStatement.setString(3, entity.getEmail());
@@ -271,23 +216,29 @@ public class UserDAOImpl implements UserDAO {
                 preparedStatement.setString(5, entity.getContactNumber());
                 preparedStatement.setBoolean(6, entity.isEnabled());
                 preparedStatement.setLong(7, entity.getRole().getId());
-                preparedStatement.executeUpdate();
-                preparedStatement = connection.prepareStatement(sqlForUserFetching);
-                resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    String sqlForCart = "INSERT INTO carts (id, total, cart_items) VALUES (" + resultSet
-                            .getLong("id") + ", 0, 0)";
-                    preparedStatement = connection.prepareStatement(sqlForCart);
-                    preparedStatement.executeUpdate();
-                    connection.commit();
-                    return true;
+                if (preparedStatement.executeUpdate() == 0) {
+                    throw new SQLException("Creating user is failed, no rows is affected! ");
                 }
-            } catch (SQLException e) {
+                generatedKeys = preparedStatement.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    userId = generatedKeys.getLong(1);
+                } else {
+                    throw new SQLException("Creating user is failed, no id is obtained! ");
+                }
+                sql = "INSERT INTO carts (id, total, cart_items) VALUES (" + userId + ", 0, 0)";
+                preparedStatement = connection.prepareStatement(sql);
+                if (preparedStatement.executeUpdate() == 0) {
+                    throw new SQLException("Creating user's cart is failed, no rows is affected! ");
+                }
+                id = userId;
+                entity.setId(id);
+                connection.commit();
+            } catch (SQLException | OnlineStoreLogicalException e) {
                 connection.rollback();
                 e.printStackTrace();
             } finally {
-                if (resultSet != null) {
-                    resultSet.close();
+                if (generatedKeys != null) {
+                    generatedKeys.close();
                 }
                 if (preparedStatement != null) {
                     preparedStatement.close();
@@ -296,16 +247,14 @@ public class UserDAOImpl implements UserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        return id;
     }
 
     @Override
     public User getById(long id) {
         String sqlForUser = "SELECT id, first_name, last_name, email, password, contact_number, enabled, role_id FROM users"
-                + " WHERE id = ?";
-        String sqlForRole = "SELECT id, name, active FROM roles WHERE id = ?";
-        User user;
-        Role role;
+                + " WHERE id = " + id;
+        User user = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try (Connection connection = getConnection()) {
@@ -313,7 +262,6 @@ public class UserDAOImpl implements UserDAO {
             connection.setAutoCommit(false);
             try {
                 preparedStatement = connection.prepareStatement(sqlForUser);
-                preparedStatement.setLong(1, id);
                 resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
                     user = new User();
@@ -324,22 +272,12 @@ public class UserDAOImpl implements UserDAO {
                     user.setPassword(resultSet.getString("password"));
                     user.setContactNumber(resultSet.getString("contact_number"));
                     user.setEnabled(resultSet.getBoolean("enabled"));
-
                     long roleId = resultSet.getLong("role_id");
-                    preparedStatement = connection.prepareStatement(sqlForRole);
-                    preparedStatement.setLong(1, roleId);
-                    resultSet = preparedStatement.executeQuery();
-                    if (resultSet.next()) {
-                        role = new Role();
-                        role.setId(resultSet.getLong("id"));
-                        role.setName(resultSet.getString("name"));
-                        role.setActive(resultSet.getBoolean("active"));
-                        user.setRole(role);
-                        connection.commit();
-                        return user;
-                    }
+                    user.setRole(getRoleById(roleId, connection, preparedStatement, resultSet));
+                    connection.commit();
                 }
             } catch (SQLException | OnlineStoreLogicalException e) {
+                user = null;
                 connection.rollback();
                 e.printStackTrace();
             } finally {
@@ -353,7 +291,7 @@ public class UserDAOImpl implements UserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return user;
     }
 
     @Override
@@ -369,7 +307,9 @@ public class UserDAOImpl implements UserDAO {
             preparedStatement.setString(5, entity.getContactNumber());
             preparedStatement.setBoolean(6, entity.isEnabled());
             preparedStatement.setLong(7, entity.getRole().getId());
-            preparedStatement.executeUpdate();
+            if (preparedStatement.executeUpdate() == 0) {
+                throw new SQLException("Creating user is failed, no rows is affected! ");
+            }
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -377,17 +317,33 @@ public class UserDAOImpl implements UserDAO {
         return false;
     }
 
-    // ?
     @Override
     public boolean remove(User entity) {
-        String sqlForCartDeleting = "DELETE FROM carts WHERE id = " + entity.getId() + ";";
-        String sqlForUserDeleting = "DELETE FROM users WHERE email = '" + entity.getEmail() + "';";
-        try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+        String sqlForOrdersFetching = "SELECT id FROM orders WHERE user_id = " + entity.getId();
+        String sqlForOrderItem = "DELETE FROM order_items WHERE order_id = ";
+        String sqlForOrder = "DELETE FROM orders WHERE user_id = " + entity.getId();
+        String sqlForAddress = "DELETE FROM addresses WHERE user_id = " + entity.getId();
+        String sqlForCartItem = "DELETE FROM cart_items WHERE cart_id = " + entity.getId();
+        String sqlForCart = "DELETE FROM carts WHERE id = " + entity.getId();
+        String sqlForUser = "DELETE FROM users WHERE id = " + entity.getId();
+        Statement statement = null;
+        ResultSet resultSet;
+        try (Connection connection = getConnection()) {
+            connection.setAutoCommit(false);
             try {
-                connection.setAutoCommit(false);
-                statement.addBatch(sqlForCartDeleting);
-                statement.addBatch(sqlForUserDeleting);
-                statement.executeBatch();
+                statement = connection.createStatement();
+                resultSet = statement.executeQuery(sqlForOrdersFetching);
+                while (resultSet.next()) {
+                    statement.addBatch(sqlForOrderItem + resultSet.getLong("id"));
+                }
+                statement.addBatch(sqlForOrder);
+                statement.addBatch(sqlForAddress);
+                statement.addBatch(sqlForCartItem);
+                statement.addBatch(sqlForCart);
+                statement.addBatch(sqlForUser);
+                if (statement.executeBatch().length == 0) {
+                    throw new SQLException("Deleting user is failed! ");
+                }
                 connection.commit();
                 return true;
             } catch (SQLException e) {
@@ -396,7 +352,38 @@ public class UserDAOImpl implements UserDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return false;
+    }
+
+
+    public static User getUserById(long id, Connection connection, PreparedStatement preparedStatement
+            , ResultSet resultSet) throws SQLException, OnlineStoreLogicalException {
+        String sql = "SELECT id, first_name, last_name, email, password, contact_number, enabled, role_id FROM users"
+                + " WHERE id = " + id;
+        User user = null;
+        preparedStatement = connection.prepareStatement(sql);
+        resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            user = new User();
+            user.setId(resultSet.getLong("id"));
+            user.setFirstName(resultSet.getString("first_name"));
+            user.setLastName(resultSet.getString("last_name"));
+            user.setEmail(resultSet.getString("email"));
+            user.setPassword(resultSet.getString("password"));
+            user.setContactNumber(resultSet.getString("contact_number"));
+            user.setEnabled(resultSet.getBoolean("enabled"));
+            long roleId = resultSet.getLong("role_id");
+            user.setRole(getRoleById(roleId, connection, preparedStatement, resultSet));
+        }
+        return user;
     }
 }
