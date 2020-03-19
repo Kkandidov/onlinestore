@@ -1,25 +1,26 @@
 package org.astashonok.onlinestorebackend.dao.daoImpl;
 
-import org.astashonok.onlinestorebackend.dao.DescriptionDAO;
-import org.astashonok.onlinestorebackend.dto.Description;
-import org.astashonok.onlinestorebackend.dto.Product;
-import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
+import org.astashonok.onlinestorebackend.dao.OrderDAO;
+import org.astashonok.onlinestorebackend.dto.Address;
+import org.astashonok.onlinestorebackend.dto.Order;
+import org.astashonok.onlinestorebackend.dto.User;
 import org.astashonok.onlinestorebackend.util.Pool;
 import org.astashonok.onlinestorebackend.util.PoolWithDataSource;
 import org.astashonok.onlinestorebackend.util.Pools;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
-public class DescriptionDAOImpl implements DescriptionDAO {
+public class OrderDAOImpl implements OrderDAO {
 
     private Pool pool;
 
-    public DescriptionDAOImpl(Pool pool) {
+    public OrderDAOImpl(Pool pool) {
         this.pool = pool;
     }
 
-    public DescriptionDAOImpl() {
+    public OrderDAOImpl() {
         pool = Pools.newPool(PoolWithDataSource.class);
     }
 
@@ -32,27 +33,32 @@ public class DescriptionDAOImpl implements DescriptionDAO {
     }
 
     @Override
-    public Description getByProduct(Product product) {
+    public List<Order> getByUser(User user) {
         return null;
     }
 
     @Override
-    public boolean add(Description entity) {
-        return false;
-    }
-
-    @Override
-    public Entity getById(long id) {
+    public List<Order> getByAddress(Address address) {
         return null;
     }
 
     @Override
-    public boolean edit(Description entity) {
+    public boolean add(Order entity) {
         return false;
     }
 
     @Override
-    public boolean remove(Description entity) {
+    public Order getById(long id) {
+        return null;
+    }
+
+    @Override
+    public boolean edit(Order entity) {
+        return false;
+    }
+
+    @Override
+    public boolean remove(Order entity) {
         return false;
     }
 }
