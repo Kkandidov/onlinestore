@@ -4,6 +4,8 @@ import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NegativeValueException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
+import java.util.Objects;
+
 public class OrderItem extends Entity {
     private Order order;
     private double total;
@@ -92,5 +94,22 @@ public class OrderItem extends Entity {
                 ", productCount=" + productCount +
                 ", productPrice=" + productPrice +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OrderItem orderItem = (OrderItem) o;
+        return Double.compare(orderItem.total, total) == 0 &&
+                productCount == orderItem.productCount &&
+                Double.compare(orderItem.productPrice, productPrice) == 0 &&
+                Objects.equals(order, orderItem.order) &&
+                Objects.equals(product, orderItem.product);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(order, total, product, productCount, productPrice);
     }
 }

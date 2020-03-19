@@ -7,6 +7,7 @@ import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferen
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class Brand extends Entity {
@@ -77,5 +78,20 @@ public class Brand extends Entity {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Brand brand = (Brand) o;
+        return active == brand.active &&
+                Objects.equals(name, brand.name) &&
+                Objects.equals(description, brand.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, active);
     }
 }

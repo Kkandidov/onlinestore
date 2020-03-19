@@ -4,10 +4,7 @@ import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NegativeValueException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Order extends Entity {
     private User user;
@@ -126,5 +123,23 @@ public class Order extends Entity {
                 ", billing=" + billing +
                 ", date=" + date +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Order order = (Order) o;
+        return Double.compare(order.total, total) == 0 &&
+                count == order.count &&
+                Objects.equals(user, order.user) &&
+                Objects.equals(shipping, order.shipping) &&
+                Objects.equals(billing, order.billing) &&
+                Objects.equals(date, order.date);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user, total, count, shipping, billing, date);
     }
 }

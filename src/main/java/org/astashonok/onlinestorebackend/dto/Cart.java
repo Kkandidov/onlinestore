@@ -6,6 +6,7 @@ import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferen
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class Cart extends Entity {
@@ -20,9 +21,11 @@ public class Cart extends Entity {
     }
 
     public Cart(User user, double total, int cartItems) {
+        this();
         this.user = user;
         this.total = total;
         this.cartItems = cartItems;
+        super.id = user.getId();
     }
 
     public User getUser() {
@@ -33,6 +36,7 @@ public class Cart extends Entity {
         if (user == null) {
             throw new NullReferenceException("The cart can't exist without a user! ");
         }
+        super.id = user.getId();
         this.user = user;
     }
 
@@ -73,5 +77,20 @@ public class Cart extends Entity {
                 ", total=" + total +
                 ", cartItems=" + cartItems +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cart cart = (Cart) o;
+        return Double.compare(cart.total, total) == 0 &&
+                cartItems == cart.cartItems &&
+                Objects.equals(user, cart.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user, total, cartItems);
     }
 }

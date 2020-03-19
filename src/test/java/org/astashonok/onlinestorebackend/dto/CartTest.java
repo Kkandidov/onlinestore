@@ -6,7 +6,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.astashonok.onlinestorebackend.configfortests.StaticInitializerDTO.user2;
+import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.user2;
 import static org.junit.Assert.*;
 
 public class CartTest {

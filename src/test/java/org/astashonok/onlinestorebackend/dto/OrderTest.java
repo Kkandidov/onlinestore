@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static org.astashonok.onlinestorebackend.configfortests.StaticInitializerDTO.*;
+import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.*;
 import static org.junit.Assert.*;
 
 public class OrderTest {
@@ -96,8 +96,8 @@ public class OrderTest {
     // if the reference to shipping address is correct
     @Test
     public void setShipping() throws NullReferenceException {
-        order.setShipping(address1);
-        assertSame(address1, order.getShipping());
+        order.setShipping(address11);
+        assertSame(address11, order.getShipping());
     }
 
     // if the reference to shipping address is null
@@ -109,8 +109,8 @@ public class OrderTest {
     // if the reference to shipping address is correct
     @Test
     public void setBilling() throws NullReferenceException {
-        order.setBilling(address2);
-        assertSame(address2, order.getBilling());
+        order.setBilling(address21);
+        assertSame(address21, order.getBilling());
     }
 
     // if the reference to date is null

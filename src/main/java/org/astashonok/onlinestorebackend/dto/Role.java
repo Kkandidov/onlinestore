@@ -7,6 +7,7 @@ import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferen
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class Role extends Entity {
@@ -67,5 +68,19 @@ public class Role extends Entity {
                 super.toString() +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Role role = (Role) o;
+        return active == role.active &&
+                Objects.equals(name, role.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, active);
     }
 }

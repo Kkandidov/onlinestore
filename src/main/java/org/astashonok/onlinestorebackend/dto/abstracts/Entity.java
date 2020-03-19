@@ -20,7 +20,6 @@ public class Entity {
         if (id < 1){
             throw new NotPositiveValueException("id value must be from 1! ");
         }
-
         this.id = id;
     }
 

@@ -8,8 +8,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.astashonok.onlinestorebackend.configfortests.StaticInitializerDTO.brand3;
-import static org.astashonok.onlinestorebackend.configfortests.StaticInitializerDTO.category1;
+import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.brand3;
+import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.category1;
 import static org.junit.Assert.*;
 
 public class ProductTest {

@@ -7,6 +7,7 @@ import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferen
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class Address extends Entity {
@@ -173,5 +174,26 @@ public class Address extends Entity {
                 ", billing=" + billing +
                 ", shipping=" + shipping +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Address address = (Address) o;
+        return billing == address.billing &&
+                shipping == address.shipping &&
+                Objects.equals(user, address.user) &&
+                Objects.equals(lineOne, address.lineOne) &&
+                Objects.equals(lineTwo, address.lineTwo) &&
+                Objects.equals(city, address.city) &&
+                Objects.equals(state, address.state) &&
+                Objects.equals(country, address.country) &&
+                Objects.equals(postalCode, address.postalCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user, lineOne, lineTwo, city, state, country, postalCode, billing, shipping);
     }
 }

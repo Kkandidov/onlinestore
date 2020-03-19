@@ -4,7 +4,7 @@ import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLo
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 import org.junit.*;
-import static org.astashonok.onlinestorebackend.configfortests.StaticInitializerDTO.user2;
+import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.user2;
 import static org.junit.Assert.*;
 
 public class AddressTest {

@@ -7,7 +7,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.astashonok.onlinestorebackend.configfortests.StaticInitializerDTO.product2;
+import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.product2;
 import static org.junit.Assert.*;
 
 public class ViewTest {

@@ -8,6 +8,7 @@ import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferen
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class Product extends Entity {
@@ -175,5 +176,24 @@ public class Product extends Entity {
                 ", active=" + active +
                 ", category=" + category +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Double.compare(product.unitPrice, unitPrice) == 0 &&
+                quantity == product.quantity &&
+                active == product.active &&
+                Objects.equals(name, product.name) &&
+                Objects.equals(code, product.code) &&
+                Objects.equals(brand, product.brand) &&
+                Objects.equals(category, product.category);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, code, brand, unitPrice, quantity, active, category);
     }
 }

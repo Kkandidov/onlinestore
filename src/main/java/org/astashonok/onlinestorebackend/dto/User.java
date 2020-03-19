@@ -6,6 +6,7 @@ import org.astashonok.onlinestorebackend.exceptions.logicalexception.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class User extends Entity {
@@ -183,6 +184,26 @@ public class User extends Entity {
                 ", password='" + password + '\'' +
                 ", contactNumber='" + contactNumber + '\'' +
                 ", enabled=" + enabled +
+                ", role=" + role +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return enabled == user.enabled &&
+                Objects.equals(firstName, user.firstName) &&
+                Objects.equals(lastName, user.lastName) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(contactNumber, user.contactNumber) &&
+                Objects.equals(role, user.role);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName, email, password, contactNumber, enabled, role);
     }
 }

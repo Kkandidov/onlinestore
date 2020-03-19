@@ -5,6 +5,8 @@ import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLo
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
+import java.util.Objects;
+
 public class View extends Entity {
     private String code;
     private Product product;
@@ -54,5 +56,19 @@ public class View extends Entity {
                 ", code='" + code + '\'' +
                 ", product=" + product +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        View view = (View) o;
+        return Objects.equals(code, view.code) &&
+                Objects.equals(product, view.product);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code, product);
     }
 }

@@ -4,6 +4,8 @@ import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NegativeValueException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
+import java.util.Objects;
+
 public class CartItem extends Entity {
     private Cart cart;
     private double total;
@@ -105,5 +107,23 @@ public class CartItem extends Entity {
                 ", productPrice=" + productPrice +
                 ", available=" + available +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CartItem cartItem = (CartItem) o;
+        return Double.compare(cartItem.total, total) == 0 &&
+                productCount == cartItem.productCount &&
+                Double.compare(cartItem.productPrice, productPrice) == 0 &&
+                available == cartItem.available &&
+                Objects.equals(cart, cartItem.cart) &&
+                Objects.equals(product, cartItem.product);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cart, total, product, productCount, productPrice, available);
     }
 }

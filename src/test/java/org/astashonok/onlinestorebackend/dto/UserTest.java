@@ -6,7 +6,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.astashonok.onlinestorebackend.configfortests.StaticInitializerDTO.*;
+import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.*;
 import static org.junit.Assert.*;
 
 public class UserTest {
@@ -149,8 +149,8 @@ public class UserTest {
     // if the reference to address is correct
     @Test
     public void setAddresses() throws NullReferenceException {
-        user.setAddresses(address3);
-        assertSame(address3, user.getAddresses().iterator().next());
+        user.setAddresses(address12);
+        assertSame(address12, user.getAddresses().iterator().next());
     }
 
     // if the reference to cart is null

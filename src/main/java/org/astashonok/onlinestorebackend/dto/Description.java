@@ -3,6 +3,8 @@ package org.astashonok.onlinestorebackend.dto;
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
+import java.util.Objects;
+
 public class Description extends Entity {
     private Product product;
     private String screen;
@@ -43,6 +45,7 @@ public class Description extends Entity {
         if (product == null) {
             throw new NullReferenceException("Description has to belong to a specific product! ");
         }
+        super.id = product.getId();
         this.product = product;
     }
 
@@ -141,5 +144,28 @@ public class Description extends Entity {
                 ", graphics='" + graphics + '\'' +
                 ", wirelessCommunication='" + wirelessCommunication + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Description that = (Description) o;
+        return Objects.equals(product, that.product) &&
+                Objects.equals(screen, that.screen) &&
+                Objects.equals(color, that.color) &&
+                Objects.equals(processor, that.processor) &&
+                Objects.equals(frontCamera, that.frontCamera) &&
+                Objects.equals(rearCamera, that.rearCamera) &&
+                Objects.equals(capacity, that.capacity) &&
+                Objects.equals(battery, that.battery) &&
+                Objects.equals(displayTechnology, that.displayTechnology) &&
+                Objects.equals(graphics, that.graphics) &&
+                Objects.equals(wirelessCommunication, that.wirelessCommunication);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(product, screen, color, processor, frontCamera, rearCamera, capacity, battery, displayTechnology, graphics, wirelessCommunication);
     }
 }
