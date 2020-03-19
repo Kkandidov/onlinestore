@@ -1,6 +1,6 @@
-package org.astashonok.onlinestorebackend.configfortests;
+package org.astashonok.onlinestorebackend.testconfig;
 
-import org.astashonok.onlinestorebackend.util.Pool;
+import org.astashonok.onlinestorebackend.util.pool.Pool;
 
 import java.io.IOException;
 import java.io.InputStream;
