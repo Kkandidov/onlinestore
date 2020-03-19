@@ -58,9 +58,9 @@ VALUES('Sergey', 'Sergeev', 'sergey@gmail.com', '$2y$12$ZSE/h0gS.Mg.qZnuwzfCxuBd
 -- populate addresses table 
 -- shipping addresses
 INSERT INTO addresses(user_id, line_one, line_two, city, state, country, postal_code, billing, shipping)
-VALUES(2, 'Platonov street', '', 'Minsk', 'Minsk', 'Belarus', '220034', true, false);
+VALUES(2, 'Platonov street', '', 'Minsk', 'Minsk', 'Belarus', '220034', false, true);
 INSERT INTO addresses(user_id, line_one, line_two, city, state, country, postal_code, billing, shipping)
-VALUES(3, 'Serdich street', '', 'Minsk', 'Minsk', 'Belarus', '220035', true, false);
+VALUES(3, 'Serdich street', '', 'Minsk', 'Minsk', 'Belarus', '220035', false, true);
 -- billing addresses
 INSERT INTO addresses(user_id, line_one, line_two, city, state, country, postal_code, billing, shipping)
 VALUES(2, 'Platonov street', '', 'Minsk', 'Minsk', 'Belarus', '220034', true, false);
