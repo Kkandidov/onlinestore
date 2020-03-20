@@ -11,32 +11,12 @@ INSERT INTO categories(name, active)
 VALUES('Player', true);
 
 -- populate brands table
-INSERT INTO brands(name, description, active)
-VALUES('Samsung','Samsung, South Korean company that is one of the world’s largest producers of electronic devices. It produces about a fifth of South Korea’s total exports', true);
-INSERT INTO brands(name, description, active)
-VALUES('Motorola','Motorola is an American multinational telecommunications company. The company was divided into two independent companies, Motorola Mobility (sold to Google and acquired by Lenovo) and Motorola Solutions (the direct successor to Motorola)', true);
-INSERT INTO brands(name, description, active)
-VALUES('Xiaomi','Xiaomi is a Chinese electronics company founded in 2010 by Lei Jun. The company creates a wide range of products including hardware, software and Internet services', true);
-INSERT INTO brands(name, description, active)
-VALUES('Apple','Apple is an American multinational technology company headquartered in Cupertino, California, that designs, develops, and sells consumer electronics, computer software, and online services', true);
-INSERT INTO brands(name, description, active)
-VALUES('Huawei','Huawei is a Chinese information and communications technology company that specializes in telecommunications equipment. The company offers services and consumer electronics including wearables, modems, smartphones, tablets and PCs', true);
-INSERT INTO brands(name, description, active)
-VALUES('Nokia','Nokia is a Finnish multinational telecommunications, information technology, and consumer electronics company, founded in 1865. Nokia\'s headquarters are in Espoo, in the greater Helsinki metropolitan area', true);
-INSERT INTO brands(name, description, active)
-VALUES('Asus','Asus is a Taiwan-based multinational computer and phone hardware and electronics company headquartered in Beitou District, Taipei, Taiwan. Its products include desktops, laptops, netbooks, mobile phones, networking equipment, monitors, tablet PCs', true);
-INSERT INTO brands(name, description, active)
-VALUES('Sony','Sony is a Japanese multinational conglomerate corporation headquartered in Kōnan, Minato, Tokyo. The company owns the largest music entertainment business in the world, the largest video game console business', true);
-INSERT INTO brands(name, description, active)
-VALUES('Lenovo','Lenovo is a Chinese multinational technology company with headquarters in Beijing. The company manufactures, and sells personal computers, tablet computers, smartphones, workstations, servers, IT management software, and smart televisions', true);
-INSERT INTO brands(name, description, active)
-VALUES('Honor','Honor is a smartphone brand owned by Huawei Technologies. As part of the Huawei Consumer Business Group\'s dual-brand strategy, Honor provides smartphone handsets targeting young consumers but has released tablet computers and wearable technology as well', true);
-INSERT INTO brands(name, description, active)
-VALUES('Acer','Acer is a Taiwanese multinational hardware and electronics corporation, headquartered in Xizhi, New Taipei City, Taiwan. Acer\'s products include desktop PCs, laptop PCs tablets, servers, virtual reality devices, displays, smartphones and peripherals', true);
-INSERT INTO brands(name, description, active)
-VALUES('iHiFi ','Xue Lin Audio is a division of the small Chinese company XueLin Electronics Co., Ltd., founded in Shenzhen in 2002. The company specializes in the development of modern microcontrollers and smart logic chips', true);
-INSERT INTO brands(name, description, active)
-VALUES('Ritmix','Ritmix is ​​a well-known Korean brand of portable electronics. Starting in 2001 Ritmix has expanded its product range in less than 10 years to a full range of portable electronics: from headphones and voice recorders to GPS navigators and e-books', true);
+INSERT INTO brands(id, name, description, active)
+VALUES(1, 'Samsung','Samsung, South Korean company that is one of the world’s largest producers of electronic devices. It produces about a fifth of South Korea’s total exports', true);
+INSERT INTO brands(id, name, description, active)
+VALUES(3, 'Xiaomi','Xiaomi is a Chinese electronics company founded in 2010 by Lei Jun. The company creates a wide range of products including hardware, software and Internet services', true);
+INSERT INTO brands(id, name, description, active)
+VALUES(10, 'Honor','Honor is a smartphone brand owned by Huawei Technologies. As part of the Huawei Consumer Business Group\'s dual-brand strategy, Honor provides smartphone handsets targeting young consumers but has released tablet computers and wearable technology as well', true);
 
 -- populate roles table
 INSERT INTO roles(name, active)

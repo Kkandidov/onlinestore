@@ -8,10 +8,32 @@
         <junit.version>4.13</junit.version>
         <hamcrest-core.version>1.3</hamcrest-core.version>
         <mysql-connector.version>8.0.19</mysql-connector.version>
+        <slf4j-api.version>1.7.30</slf4j-api.version>
+        <slf4j-log4j12.version>1.7.30</slf4j-log4j12.version>
+        <log4j-core.version>2.13.1</log4j-core.version>
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <!-- dependencies for logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j-api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j-log4j12.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j-core.version}</version>
+        </dependency>
+
+        <!-- dependencies for testing -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -19,7 +41,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest-core -->
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>
@@ -27,7 +48,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <!-- dependency for db -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -35,9 +56,6 @@
         </dependency>
 
     </dependencies>
-
-
-
 
     <groupId>org.astashonok</groupId>
     <artifactId>onlinestore</artifactId>

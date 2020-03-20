@@ -1,94 +1,81 @@
 package org.astashonok.onlinestorebackend.daoImpl;
 
-import org.astashonok.onlinestorebackend.dto.Product;
 import org.astashonok.onlinestorebackend.dto.View;
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendException;
 import org.astashonok.onlinestorebackend.testconfig.SimpleSingleConnection;
-import org.astashonok.onlinestorebackend.util.pool.Pools;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.view32;
+import static org.astashonok.onlinestorebackend.testconfig.StaticTestInitializer.*;
 import static org.junit.Assert.*;
 
 public class ViewDAOImplTest {
 
-    private static ViewDAOImpl viewDAO;
-    private static ProductDAOImpl productDAO;
-
-    @BeforeClass
-    public static void init() {
-        System.out.println("Initialization of our object! ");
-        viewDAO = new ViewDAOImpl(Pools.newPool(SimpleSingleConnection.class));
-        productDAO = new ProductDAOImpl(Pools.newPool(SimpleSingleConnection.class));
-    }
-
-    @AfterClass
-    public static void destroy() {
-        System.out.println("Destruction of our object! ");
-        viewDAO = null;
-        productDAO = null;
-    }
-
-    @Test
-    public void getByProduct() {
-        Product product = productDAO.getById(1);
-        int expected = 5;
-        int actual = viewDAO.getByProduct(product).size();
-        assertEquals(expected, actual);
-
-        product = productDAO.getById(3);
-        expected = 2;
-        actual = viewDAO.getByProduct(product).size();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void add() throws SQLException {
-        Product product = productDAO.getById(3);
-        View view = new View("PRD1111111111111", product);
-        long id = viewDAO.add(view);
-        int expected = 3;
-        int actual = viewDAO.getByProduct(product).size();
-        assertEquals(expected, actual);
-
-        // database reset
+    @After
+    public void resetDatabase() throws SQLException {
+        System.out.println("Reset database...");
         Connection connection = SimpleSingleConnection.getInstance().getConnection();
-        String sql = "DELETE FROM views WHERE id = " + id;
+        connection.setAutoCommit(false);
         Statement statement = connection.createStatement();
-        statement.executeUpdate(sql);
+        statement.addBatch("SET FOREIGN_KEY_CHECKS=0");
+        statement.addBatch("TRUNCATE TABLE views");
+        statement.addBatch("SET FOREIGN_KEY_CHECKS=1");
+        statement.addBatch("INSERT INTO views(code, product_id) VALUES('PRD1581865664262', 1)");
+        statement.addBatch("INSERT INTO views(code, product_id) VALUES('PRD1581865665263', 1)");
+        statement.addBatch("INSERT INTO views(code, product_id) VALUES('PRD1581865666263', 1)");
+        statement.addBatch("INSERT INTO views(code, product_id) VALUES('PRD1581865667263', 1)");
+        statement.addBatch("INSERT INTO views(code, product_id) VALUES('PRD1581865668263', 1)");
+        statement.addBatch("INSERT INTO views(code, product_id) VALUES('PRD1581866052337', 2)");
+        statement.addBatch("INSERT INTO views(code, product_id) VALUES('PRD1581866053337', 2)");
+        statement.addBatch("INSERT INTO views(code, product_id) VALUES('PRD1581866054337', 2)");
+        statement.addBatch("INSERT INTO views(code, product_id) VALUES('PRD1581866055338', 2)");
+        statement.addBatch("INSERT INTO views(code, product_id) VALUES('PRD1581866056338', 2)");
+        statement.addBatch("INSERT INTO views(code, product_id) VALUES('PRD1581866965493', 3)");
+        statement.addBatch("INSERT INTO views(code, product_id) VALUES('PRD1581866966495', 3)");
+        statement.executeBatch();
+        connection.commit();
+        System.out.println("Resetting is successfully!");
+    }
+    @Test
+    public void getByProduct() throws BackendException {
+        int expected = 5;
+        int actual = viewDAO.getByProduct(product1).size();
+        assertEquals(expected, actual);
     }
 
     @Test
-    public void getById() {
+    public void add() throws SQLException, BackendException {
+        View expected = new View("PRD1111111111111", product3);
+        long id = viewDAO.add(expected);
+        View actual = viewDAO.getById(id);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void getById() throws BackendException {
         View expected = view32;
         View actual = viewDAO.getById(12);
         assertEquals(expected, actual);
     }
 
     @Test
-    public void edit() throws OnlineStoreLogicalException {
-        View expected = viewDAO.getById(10);
+    public void edit() throws BackendException {
+        View expected = view25;
         expected.setCode("PRD5555555555555");
-        assertTrue(viewDAO.edit(expected));
+        viewDAO.edit(expected);
         View actual = viewDAO.getById(10);
         assertEquals(expected, actual);
-
-        //database reset
         expected.setCode("PRD1581866056338");
-        assertTrue(viewDAO.edit(expected));
     }
 
     @Test
-    public void remove() {
-        Product product = productDAO.getById(3);
-        View view = new View("PRD1111111111111", product);
-        long id = viewDAO.add(view);
-        assertTrue(viewDAO.remove(view));
+    public void remove() throws BackendException {
+        View expected = new View("PRD1111111111111", product3);
+        long id = viewDAO.add(expected);
+        View actual = viewDAO.getById(id);
+        assertEquals(expected, actual);
     }
 }

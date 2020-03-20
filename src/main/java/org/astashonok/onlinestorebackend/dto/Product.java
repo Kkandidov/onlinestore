@@ -1,7 +1,7 @@
 package org.astashonok.onlinestorebackend.dto;
 
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NegativeValueException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
@@ -53,7 +53,7 @@ public class Product extends Entity {
         return name;
     }
 
-    public void setName(String name) throws OnlineStoreLogicalException {
+    public void setName(String name) throws BackendLogicalException {
         if (name == null) {
             throw new NullReferenceException("The name must be indicated in the product! ");
         }
@@ -67,7 +67,7 @@ public class Product extends Entity {
         return code;
     }
 
-    public void setCode(String code) throws OnlineStoreLogicalException {
+    public void setCode(String code) throws BackendLogicalException {
         if (code == null) {
             throw new NullReferenceException("The name must be indicated in the product! ");
         }

@@ -1,12 +1,12 @@
 package org.astashonok.onlinestorebackend.dto;
 
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.*;
+import static org.astashonok.onlinestorebackend.testconfig.StaticTestInitializer.*;
 import static org.junit.Assert.*;
 
 public class UserTest {
@@ -27,37 +27,37 @@ public class UserTest {
 
     // if the reference to firstName is null
     @Test(expected = NullReferenceException.class)
-    public void setFirstNameIsNull() throws OnlineStoreLogicalException {
+    public void setFirstNameIsNull() throws BackendLogicalException {
         user.setFirstName(null);
     }
 
     // if the reference to firstName is empty
     @Test(expected = EmptyFieldException.class)
-    public void setFirstNameIsEmpty() throws OnlineStoreLogicalException {
+    public void setFirstNameIsEmpty() throws BackendLogicalException {
         user.setFirstName("");
     }
 
     // if the reference to firstName is correct
     @Test
-    public void setFirstName() throws OnlineStoreLogicalException {
+    public void setFirstName() throws BackendLogicalException {
         user.setFirstName("Mike");
     }
 
     // if the reference to email is empty
     @Test (expected = EmptyFieldException.class)
-    public void setEmailIsEmpty() throws OnlineStoreLogicalException {
+    public void setEmailIsEmpty() throws BackendLogicalException {
         user.setEmail("");
     }
 
     // if the reference to email is null
     @Test(expected = NullReferenceException.class)
-    public void setEmailIsNull() throws OnlineStoreLogicalException {
+    public void setEmailIsNull() throws BackendLogicalException {
         user.setEmail(null);
     }
 
     // if the reference to email is correct
     @Test
-    public void setEmail1() throws OnlineStoreLogicalException {
+    public void setEmail1() throws BackendLogicalException {
         user.setEmail("petr@gmail.com");
         String expected = "petr@gmail.com";
         String actual = user.getEmail();
@@ -66,19 +66,19 @@ public class UserTest {
 
     // if the reference to password is empty
     @Test(expected = EmptyFieldException.class)
-    public void setPasswordIsEmpty() throws OnlineStoreLogicalException {
+    public void setPasswordIsEmpty() throws BackendLogicalException {
         user.setPassword("");
     }
 
     // if the reference to password is null
     @Test(expected = NullReferenceException.class)
-    public void setPasswordIsNull() throws OnlineStoreLogicalException {
+    public void setPasswordIsNull() throws BackendLogicalException {
         user.setPassword(null);
     }
 
     // if the reference to password is correct
     @Test
-    public void setPassword1() throws OnlineStoreLogicalException {
+    public void setPassword1() throws BackendLogicalException {
         user.setPassword("n!k@sn1Kos");
         String expected = "n!k@sn1Kos";
         String actual = user.getPassword();
@@ -87,19 +87,19 @@ public class UserTest {
 
     // if the reference to number is empty
     @Test(expected = EmptyFieldException.class)
-    public void setContactNumberIsEmpty() throws OnlineStoreLogicalException {
+    public void setContactNumberIsEmpty() throws BackendLogicalException {
         user.setContactNumber("");
     }
 
     // if the reference to number is null
     @Test(expected = NullReferenceException.class)
-    public void setContactNumberIsNull() throws OnlineStoreLogicalException {
+    public void setContactNumberIsNull() throws BackendLogicalException {
         user.setContactNumber(null);
     }
 
     // if the reference to number is correct
     @Test
-    public void setContactNumber1() throws OnlineStoreLogicalException {
+    public void setContactNumber1() throws BackendLogicalException {
         user.setContactNumber("+375296543218");
         String expected = "+375296543218";
         String actual = user.getContactNumber();
@@ -121,19 +121,19 @@ public class UserTest {
 
     // if the reference to confirmPassword is null
     @Test(expected = NullReferenceException.class)
-    public void setConfirmPasswordIsNull() throws OnlineStoreLogicalException {
+    public void setConfirmPasswordIsNull() throws BackendLogicalException {
         user.setConfirmPassword(null);
     }
 
     // if the reference to confirmPassword is empty
     @Test(expected = EmptyFieldException.class)
-    public void setConfirmPasswordIsEmpty() throws OnlineStoreLogicalException {
+    public void setConfirmPasswordIsEmpty() throws BackendLogicalException {
         user.setConfirmPassword("");
     }
 
     // if the reference to confirmPassword is correct
     @Test
-    public void setConfirmPassword() throws OnlineStoreLogicalException {
+    public void setConfirmPassword() throws BackendLogicalException {
         user.setConfirmPassword("n!k@sn1Kos");
         String expected = "n!k@sn1Kos";
         String actual = user.getConfirmPassword();

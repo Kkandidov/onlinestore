@@ -1,6 +1,6 @@
 package org.astashonok.onlinestorebackend.dto;
 
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 import org.junit.AfterClass;
@@ -27,19 +27,19 @@ public class BrandTest {
 
     // if the reference to name is empty
     @Test(expected = EmptyFieldException.class)
-    public void setNameIsEmpty() throws OnlineStoreLogicalException {
+    public void setNameIsEmpty() throws BackendLogicalException {
         brand.setName("");
     }
 
     // if the reference to name is null
     @Test(expected = NullReferenceException.class)
-    public void setNameIsNull() throws OnlineStoreLogicalException {
+    public void setNameIsNull() throws BackendLogicalException {
         brand.setName(null);
     }
 
     // if the reference to is correct
     @Test
-    public void setName() throws OnlineStoreLogicalException {
+    public void setName() throws BackendLogicalException {
         brand.setName("Apple");
         String expected = "Apple";
         String actual = brand.getName();

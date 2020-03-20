@@ -1,7 +1,7 @@
 package org.astashonok.onlinestorebackend.dto;
 
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
@@ -28,7 +28,7 @@ public class View extends Entity {
         return code;
     }
 
-    public void setCode(String code) throws OnlineStoreLogicalException {
+    public void setCode(String code) throws BackendLogicalException {
         if (code == null) {
             throw new NullReferenceException("The code must be indicated in the view! ");
         }

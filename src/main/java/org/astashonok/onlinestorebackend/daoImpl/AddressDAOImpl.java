@@ -3,10 +3,15 @@ package org.astashonok.onlinestorebackend.daoImpl;
 import org.astashonok.onlinestorebackend.dao.AddressDAO;
 import org.astashonok.onlinestorebackend.dto.Address;
 import org.astashonok.onlinestorebackend.dto.User;
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.technicalexception.DatabaseException;
+import org.astashonok.onlinestorebackend.util.ClassName;
 import org.astashonok.onlinestorebackend.util.pool.Pool;
 import org.astashonok.onlinestorebackend.util.pool.PoolWithDataSource;
 import org.astashonok.onlinestorebackend.util.pool.Pools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.*;
@@ -16,6 +21,7 @@ import static org.astashonok.onlinestorebackend.daoImpl.UserDAOImpl.getUserById;
 public class AddressDAOImpl implements AddressDAO {
 
     private Pool pool;
+    private static final Logger logger = LoggerFactory.getLogger(ClassName.getCurrentClassName());
 
     public AddressDAOImpl(Pool pool) {
         this.pool = pool;
@@ -34,7 +40,8 @@ public class AddressDAOImpl implements AddressDAO {
     }
 
     @Override
-    public Address getBillingAddressByUser(User user) {
+    public Address getBillingAddressByUser(User user) throws BackendException {
+        logger.info("Invoking of getBillingAddressByUser(User user) method: {}", user);
         String sql = "SELECT id, user_id, line_one, line_two, city, state, country, postal_code, billing, shipping "
                 + "FROM addresses WHERE billing = 1 AND user_id = " + user.getId();
         Address address = null;
@@ -53,15 +60,20 @@ public class AddressDAOImpl implements AddressDAO {
                 address.setBilling(resultSet.getBoolean("billing"));
                 address.setShipping(resultSet.getBoolean("shipping"));
             }
-        } catch (SQLException | OnlineStoreLogicalException e) {
-            address = null;
-            e.printStackTrace();
+            logger.info("The address was fetched from database: {}", address);
+        } catch (BackendLogicalException e) {
+            logger.error("No address was fetched from database", e);
+            throw e;
+        } catch (SQLException e) {
+            logger.error("SQLException", e);
+            throw new DatabaseException("SQLException", e);
         }
         return address;
     }
 
     @Override
-    public List<Address> getShippingAddressesByUser(User user) {
+    public List<Address> getShippingAddressesByUser(User user) throws BackendException {
+        logger.info("Invoking of getShippingAddressesByUser(User user) method: {}", user);
         String sql = "SELECT id, user_id, line_one, line_two, city, state, country, postal_code, billing, shipping "
                 + "FROM addresses WHERE shipping = 1 ANd user_id = " + user.getId();
         List<Address> addresses = new ArrayList<>();
@@ -82,18 +94,23 @@ public class AddressDAOImpl implements AddressDAO {
                 address.setShipping(resultSet.getBoolean("shipping"));
                 addresses.add(address);
             }
-        } catch (SQLException | OnlineStoreLogicalException e) {
-            addresses = null;
-            e.printStackTrace();
+            logger.info("The addresses were fetched from database: {}", addresses);
+        } catch (BackendLogicalException e) {
+            logger.error("No addresses were fetched from database", e);
+            throw e;
+        } catch (SQLException e) {
+            logger.error("SQLException", e);
+            throw new DatabaseException("SQLException", e);
         }
         return addresses;
     }
 
     @Override
-    public long add(Address entity) {
+    public long add(Address entity) throws BackendException {
+        logger.info("Invoking of add(Address entity) method: {}", entity);
         String sql = "INSERT INTO addresses(user_id, line_one, line_two, city, state, country, postal_code, billing"
                 + ", shipping) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        long id = 0;
+        long id;
         ResultSet generatedKeys = null;
         try (Connection connection = getConnection()
              ; PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -107,23 +124,30 @@ public class AddressDAOImpl implements AddressDAO {
             preparedStatement.setBoolean(8, entity.isBilling());
             preparedStatement.setBoolean(9, entity.isShipping());
             if (preparedStatement.executeUpdate() == 0) {
-                throw new SQLException("Creating address is failed, no rows is affected! ");
+                logger.error("Creating the address is failed, no rows is affected");
+                throw new DatabaseException("Creating the address is failed, no rows is affected");
             }
             generatedKeys = preparedStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 id = generatedKeys.getLong(1);
                 entity.setId(id);
             } else {
-                throw new SQLException("Creating address is failed, no id is obtained! ");
+                logger.error("The address key isn't fetched from database");
+                throw new DatabaseException("The address key isn't fetched from database");
             }
-        } catch (SQLException | OnlineStoreLogicalException e) {
-            e.printStackTrace();
+            logger.info("The address was added, its id = {}", id);
+        } catch (BackendLogicalException e) {
+            logger.error("The address wasn't added", e);
+            throw e;
+        } catch (SQLException e) {
+            logger.error("SQLException", e);
+            throw new DatabaseException("SQLException", e);
         } finally {
             if (generatedKeys != null) {
                 try {
                     generatedKeys.close();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("All the resources weren't closed", e);
                 }
             }
         }
@@ -131,53 +155,34 @@ public class AddressDAOImpl implements AddressDAO {
     }
 
     @Override
-    public Address getById(long id) {
-        String sql = "SELECT id, user_id, line_one, line_two, city, state, country, postal_code, billing, shipping"
-                + " FROM addresses WHERE id = " + id;
-        Address address = null;
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
+    public Address getById(long id) throws BackendException {
+        logger.info("Invoking of getById(long id), id = {}", id);
+        Address address;
         try (Connection connection = getConnection()) {
-            //transaction execution
             connection.setAutoCommit(false);
             try {
-                preparedStatement = connection.prepareStatement(sql);
-                resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    address = new Address();
-                    address.setId(resultSet.getLong("id"));
-                    address.setLineOne(resultSet.getString("line_one"));
-                    address.setLineTwo(resultSet.getString("line_two"));
-                    address.setCity(resultSet.getString("city"));
-                    address.setState(resultSet.getString("state"));
-                    address.setCountry(resultSet.getString("country"));
-                    address.setPostalCode(resultSet.getString("postal_code"));
-                    address.setBilling(resultSet.getBoolean("billing"));
-                    address.setShipping(resultSet.getBoolean("shipping"));
-                    long userId = resultSet.getLong("user_id");
-                    address.setUser(getUserById(userId, connection, preparedStatement, resultSet));
-                    connection.commit();
-                }
-            } catch (SQLException | OnlineStoreLogicalException e) {
-                address = null;
+                address = getAddressById(id, connection);
+                connection.commit();
+                logger.info("The address was fetched from database: {}", address);
+            } catch (BackendLogicalException e) {
                 connection.rollback();
-                e.printStackTrace();
-            } finally {
-                if (resultSet != null) {
-                    resultSet.close();
-                }
-                if (preparedStatement != null) {
-                    preparedStatement.close();
-                }
+                logger.error("The address wasn't fetched from database", e);
+                throw e;
+            } catch (SQLException e) {
+                connection.rollback();
+                logger.error("SQLException", e);
+                throw new DatabaseException("SQLException", e);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("SQLException", e);
+            throw new DatabaseException("SQLException", e);
         }
         return address;
     }
 
     @Override
-    public boolean edit(Address entity) {
+    public boolean edit(Address entity) throws BackendException {
+        logger.info("Invoking of edit(Address entity): {} ", entity);
         String sql = "UPDATE addresses SET user_id = ?, line_one = ?, line_two = ?, city = ?, state = ?, country = ?"
                 + ", postal_code = ?, billing = ?, shipping = ? WHERE id = ?";
         try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -192,83 +197,56 @@ public class AddressDAOImpl implements AddressDAO {
             preparedStatement.setBoolean(8, entity.isBilling());
             preparedStatement.setBoolean(9, entity.isShipping());
             if (preparedStatement.executeUpdate() == 0) {
-                throw new SQLException("Creating address is failed, no rows is affected! ");
+                logger.error("Updating the address is failed, no rows is affected");
+                throw new DatabaseException("Updating the address is failed, no rows is affected");
             }
+            logger.info("The address was updated");
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("SQLException", e);
+            throw new DatabaseException("SQLException", e);
         }
-        return false;
     }
 
+    // ENGINE = InnoDB and ON DELETE CASCADE are used in this project
     @Override
-    public boolean remove(Address entity) {
-        String sqlForOrderFetching = entity.isShipping()
-                ? "SELECT id FROM orders WHERE shipping_id = " + entity.getId()
-                : "SELECT id FROM orders WHERE billing_id = " + entity.getId();
-        String sqlForOrderItem = "DELETE FROM order_items WHERE order_id = ";
-        String sqlForOrder = "DELETE FROM orders WHERE id = ";
-        String sqlForAddress = "DELETE FROM addresses WHERE id = " + entity.getId();
-        Statement statement = null;
-        ResultSet resultSet;
-        List<Long> list = new ArrayList<>();
-        try (Connection connection = getConnection()) {
-            connection.setAutoCommit(false);
-            try {
-                statement = connection.createStatement();
-                resultSet = statement.executeQuery(sqlForOrderFetching);
-                while (resultSet.next()) {
-                    list.add(resultSet.getLong("id"));
-                }
-                for (long i : list) {
-                    statement.addBatch(sqlForOrderItem + i);
-                    statement.addBatch(sqlForOrder + i);
-                }
-                statement.addBatch(sqlForAddress);
-                if (statement.executeBatch().length == 0) {
-                    throw new SQLException("Deleting address is failed! ");
-                }
-                connection.commit();
-                return true;
-            } catch (SQLException e) {
-                connection.rollback();
-                e.printStackTrace();
+    public boolean remove(Address entity) throws BackendException {
+        logger.info("Invoking of remove(Address entity): {}", entity);
+        String sql = "DELETE FROM addresses WHERE id = " + entity.getId();
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            if (preparedStatement.executeUpdate() == 0) {
+                logger.error("Deleting the address is failed, no rows is affected");
+                throw new DatabaseException("Deleting the address is failed, no rows is affected");
             }
+            logger.info("The address was deleted successfully");
+            return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            logger.error("SQLException", e);
+            throw new DatabaseException("SQLException", e);
         }
-        return false;
     }
 
 
-    public static Address getAddressById(long id, Connection connection, PreparedStatement preparedStatement
-            , ResultSet resultSet) throws SQLException, OnlineStoreLogicalException {
+    static Address getAddressById(long id, Connection connection) throws SQLException, BackendLogicalException {
         String sql = "SELECT id, user_id, line_one, line_two, city, state, country, postal_code, billing, shipping"
                 + " FROM addresses WHERE id = " + id;
         Address address = null;
-        preparedStatement = connection.prepareStatement(sql);
-        resultSet = preparedStatement.executeQuery();
-        if (resultSet.next()) {
-            address = new Address();
-            address.setId(resultSet.getLong("id"));
-            address.setLineOne(resultSet.getString("line_one"));
-            address.setLineTwo(resultSet.getString("line_two"));
-            address.setCity(resultSet.getString("city"));
-            address.setState(resultSet.getString("state"));
-            address.setCountry(resultSet.getString("country"));
-            address.setPostalCode(resultSet.getString("postal_code"));
-            address.setBilling(resultSet.getBoolean("billing"));
-            address.setShipping(resultSet.getBoolean("shipping"));
-            long userId = resultSet.getLong("user_id");
-            address.setUser(getUserById(userId, connection, preparedStatement, resultSet));
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)
+             ; ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                address = new Address();
+                address.setId(resultSet.getLong("id"));
+                address.setLineOne(resultSet.getString("line_one"));
+                address.setLineTwo(resultSet.getString("line_two"));
+                address.setCity(resultSet.getString("city"));
+                address.setState(resultSet.getString("state"));
+                address.setCountry(resultSet.getString("country"));
+                address.setPostalCode(resultSet.getString("postal_code"));
+                address.setBilling(resultSet.getBoolean("billing"));
+                address.setShipping(resultSet.getBoolean("shipping"));
+                long userId = resultSet.getLong("user_id");
+                address.setUser(getUserById(userId, connection));
+            }
         }
         return address;
     }

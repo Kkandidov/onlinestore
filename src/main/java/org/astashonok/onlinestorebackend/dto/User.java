@@ -1,7 +1,7 @@
 package org.astashonok.onlinestorebackend.dto;
 
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.*;
 
 import java.util.Arrays;
@@ -51,7 +51,7 @@ public class User extends Entity {
         return firstName;
     }
 
-    public void setFirstName(String firstName) throws OnlineStoreLogicalException {
+    public void setFirstName(String firstName) throws BackendLogicalException {
         if (firstName == null) {
             throw new NullReferenceException("The firstName must be indicated in the user! ");
         }
@@ -73,7 +73,7 @@ public class User extends Entity {
         return email;
     }
 
-    public void setEmail(String email) throws OnlineStoreLogicalException {
+    public void setEmail(String email) throws BackendLogicalException {
         if (email == null) {
             throw new NullReferenceException("The email must be indicated in the user! ");
         }
@@ -87,7 +87,7 @@ public class User extends Entity {
         return password;
     }
 
-    public void setPassword(String password) throws OnlineStoreLogicalException {
+    public void setPassword(String password) throws BackendLogicalException {
         if (password == null) {
             throw new NullReferenceException("The password must be indicated in the user! ");
         }
@@ -101,7 +101,7 @@ public class User extends Entity {
         return contactNumber;
     }
 
-    public void setContactNumber(String contactNumber) throws OnlineStoreLogicalException {
+    public void setContactNumber(String contactNumber) throws BackendLogicalException {
         if (contactNumber == null) {
             throw new NullReferenceException("The contactNumber must be indicated in the user! ");
         }
@@ -164,7 +164,7 @@ public class User extends Entity {
         return confirmPassword;
     }
 
-    public void setConfirmPassword(String confirmPassword) throws OnlineStoreLogicalException {
+    public void setConfirmPassword(String confirmPassword) throws BackendLogicalException {
         if (confirmPassword == null) {
             throw new NullReferenceException("The confirmPassword must not be null! ");
         }

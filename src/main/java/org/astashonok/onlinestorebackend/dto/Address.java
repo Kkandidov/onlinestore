@@ -1,7 +1,7 @@
 package org.astashonok.onlinestorebackend.dto;
 
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
@@ -62,7 +62,7 @@ public class Address extends Entity {
         return lineOne;
     }
 
-    public void setLineOne(String lineOne) throws OnlineStoreLogicalException {
+    public void setLineOne(String lineOne) throws BackendLogicalException {
         if (lineOne == null) {
             throw new NullReferenceException("The lineOne must be indicated in the address! ");
         }
@@ -84,7 +84,7 @@ public class Address extends Entity {
         return city;
     }
 
-    public void setCity(String city) throws OnlineStoreLogicalException {
+    public void setCity(String city) throws BackendLogicalException {
         if (city == null) {
             throw new NullReferenceException("The city must be indicated in the address! ");
         }
@@ -98,7 +98,7 @@ public class Address extends Entity {
         return state;
     }
 
-    public void setState(String state) throws OnlineStoreLogicalException {
+    public void setState(String state) throws BackendLogicalException {
         if (state == null) {
             throw new NullReferenceException("The state must be indicated in the address! ");
         }
@@ -112,7 +112,7 @@ public class Address extends Entity {
         return country;
     }
 
-    public void setCountry(String country) throws OnlineStoreLogicalException {
+    public void setCountry(String country) throws BackendLogicalException {
         if (country == null) {
             throw new NullReferenceException("The country must be indicated in the address! ");
         }
@@ -126,7 +126,7 @@ public class Address extends Entity {
         return postalCode;
     }
 
-    public void setPostalCode(String postalCode) throws OnlineStoreLogicalException {
+    public void setPostalCode(String postalCode) throws BackendLogicalException {
         if (postalCode == null) {
             throw new NullReferenceException("The postalCode must be indicated in the address! ");
         }

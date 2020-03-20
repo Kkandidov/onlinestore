@@ -4,10 +4,15 @@ import org.astashonok.onlinestorebackend.dao.OrderDAO;
 import org.astashonok.onlinestorebackend.dto.Address;
 import org.astashonok.onlinestorebackend.dto.Order;
 import org.astashonok.onlinestorebackend.dto.User;
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.technicalexception.DatabaseException;
+import org.astashonok.onlinestorebackend.util.ClassName;
 import org.astashonok.onlinestorebackend.util.pool.Pool;
 import org.astashonok.onlinestorebackend.util.pool.PoolWithDataSource;
 import org.astashonok.onlinestorebackend.util.pool.Pools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -19,6 +24,7 @@ import static org.astashonok.onlinestorebackend.daoImpl.UserDAOImpl.getUserById;
 public class OrderDAOImpl implements OrderDAO {
 
     private Pool pool;
+    private static final Logger logger = LoggerFactory.getLogger(ClassName.getCurrentClassName());
 
     public OrderDAOImpl(Pool pool) {
         this.pool = pool;
@@ -37,14 +43,14 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public List<Order> getByUser(User user) {
+    public List<Order> getByUser(User user) throws BackendException {
+        logger.info("Invoking of getByUser(User user) method: {}", user);
         String sql = "SELECT id, user_id, total, count, shipping_id, billing_id, date FROM orders WHERE user_id = " + user.getId();
         Order order;
         List<Order> list = new ArrayList<>();
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try (Connection connection = getConnection()) {
-            // transaction execution
             connection.setAutoCommit(false);
             try {
                 preparedStatement = connection.prepareStatement(sql);
@@ -58,15 +64,20 @@ public class OrderDAOImpl implements OrderDAO {
                     order.setDate(new java.util.Date(resultSet.getTimestamp("date").getTime()));
                     long shipping = resultSet.getLong("shipping_id");
                     long billing = resultSet.getLong("billing_id");
-                    order.setShipping(getAddressById(shipping, connection, preparedStatement, resultSet));
-                    order.setBilling(getAddressById(billing, connection, preparedStatement, resultSet));
+                    order.setShipping(getAddressById(shipping, connection));
+                    order.setBilling(getAddressById(billing, connection));
                     list.add(order);
                 }
                 connection.commit();
-            } catch (SQLException | OnlineStoreLogicalException e) {
-                list = null;
+                logger.info("The orders were fetched from database: {}", list);
+            } catch (BackendLogicalException e) {
                 connection.rollback();
-                e.printStackTrace();
+                logger.error("The orders wasn't fetched from database", e);
+                throw e;
+            } catch (SQLException e) {
+                connection.rollback();
+                logger.error("SQLException", e);
+                throw new DatabaseException("SQLException", e);
             } finally {
                 if (resultSet != null) {
                     resultSet.close();
@@ -76,13 +87,15 @@ public class OrderDAOImpl implements OrderDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("SQLException", e);
+            throw new DatabaseException("SQLException", e);
         }
         return list;
     }
 
     @Override
-    public List<Order> getByAddress(Address address) {
+    public List<Order> getByAddress(Address address) throws BackendException {
+        logger.info("Invoking of getByAddress(Address address) method: {}", address);
         String sql = address.isShipping()
                 ? "SELECT id, user_id, total, count, shipping_id, billing_id, date FROM orders WHERE shipping_id = " + address.getId()
                 : "SELECT id, user_id, total, count, shipping_id, billing_id, date FROM orders WHERE billing_id = " + address.getId();
@@ -91,7 +104,6 @@ public class OrderDAOImpl implements OrderDAO {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try (Connection connection = getConnection()) {
-            // transaction execution
             connection.setAutoCommit(false);
             try {
                 preparedStatement = connection.prepareStatement(sql);
@@ -107,20 +119,25 @@ public class OrderDAOImpl implements OrderDAO {
                     if (address.isShipping()) {
                         order.setShipping(address);
                         addressId = resultSet.getLong("billing_id");
-                        order.setBilling(getAddressById(addressId, connection, preparedStatement, resultSet));
+                        order.setBilling(getAddressById(addressId, connection));
                     } else {
                         order.setBilling(address);
                         addressId = resultSet.getLong("shipping_id");
-                        order.setShipping(getAddressById(addressId, connection, preparedStatement, resultSet));
+                        order.setShipping(getAddressById(addressId, connection));
                     }
-                    order.setUser(getUserById(userId, connection, preparedStatement, resultSet));
+                    order.setUser(getUserById(userId, connection));
                     list.add(order);
                 }
                 connection.commit();
-            } catch (SQLException | OnlineStoreLogicalException e) {
-                list = null;
+                logger.info("The orders were fetched from database: {}", list);
+            } catch (BackendLogicalException e) {
                 connection.rollback();
-                e.printStackTrace();
+                logger.error("The orders weren't fetched from database", e);
+                throw e;
+            } catch (SQLException e) {
+                connection.rollback();
+                logger.error("SQLException", e);
+                throw new DatabaseException("SQLException", e);
             } finally {
                 if (resultSet != null) {
                     resultSet.close();
@@ -130,15 +147,17 @@ public class OrderDAOImpl implements OrderDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("SQLException", e);
+            throw new DatabaseException("SQLException", e);
         }
         return list;
     }
 
     @Override
-    public long add(Order entity) {
+    public long add(Order entity) throws BackendException {
+        logger.info("Invoking of add(Order entity) method: {}", entity);
         String sql = "INSERT INTO orders (user_id, total, count, shipping_id, billing_id, date) VALUES (?, ?, ?, ?, ?, ?)";
-        long id = 0;
+        long id;
         ResultSet generatedKeys = null;
         try (Connection connection = getConnection()
              ; PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -149,23 +168,29 @@ public class OrderDAOImpl implements OrderDAO {
             preparedStatement.setLong(5, entity.getBilling().getId());
             preparedStatement.setTimestamp(6, new java.sql.Timestamp(entity.getDate().getTime()));
             if (preparedStatement.executeUpdate() == 0) {
-                throw new SQLException("Creating order is failed, no rows is affected! ");
+                logger.error("Creating the order is failed, no rows is affected");
+                throw new DatabaseException("Creating the order is failed, no rows is affected");
             }
             generatedKeys = preparedStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 id = generatedKeys.getLong(1);
                 entity.setId(id);
             } else {
-                throw new SQLException("Creating order is failed, no id is obtained! ");
+                logger.error("The order key isn't fetched from database");
+                throw new DatabaseException("The order key isn't fetched from database");
             }
-        } catch (SQLException | OnlineStoreLogicalException e) {
-            e.printStackTrace();
+        } catch (BackendLogicalException e) {
+            logger.error("The order wasn't added", e);
+            throw e;
+        } catch (SQLException e) {
+            logger.error("SQLException", e);
+            throw new DatabaseException("SQLException", e);
         } finally {
             if (generatedKeys != null) {
                 try {
                     generatedKeys.close();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("All the resources weren't closed", e);
                 }
             }
         }
@@ -173,51 +198,34 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public Order getById(long id) {
-        String sql = "SELECT id, user_id, total, count, shipping_id, billing_id, date FROM orders WHERE id = " + id;
-        Order order = null;
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
+    public Order getById(long id) throws BackendException {
+        logger.info("Invoking of getById(long id), id = {}", id);
+        Order order;
         try (Connection connection = getConnection()) {
-            // transaction execution
             connection.setAutoCommit(false);
             try {
-                preparedStatement = connection.prepareStatement(sql);
-                resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    order = new Order();
-                    order.setId(resultSet.getLong("id"));
-                    long userId = resultSet.getLong("user_id");
-                    order.setTotal(resultSet.getDouble("total"));
-                    order.setCount(resultSet.getInt("count"));
-                    order.setDate(new java.util.Date(resultSet.getTimestamp("date").getTime()));
-                    long shipping = resultSet.getLong("shipping_id");
-                    long billing = resultSet.getLong("billing_id");
-                    order.setShipping(getAddressById(shipping, connection, preparedStatement, resultSet));
-                    order.setBilling(getAddressById(billing, connection, preparedStatement, resultSet));
-                    order.setUser(getUserById(userId, connection, preparedStatement, resultSet));
-                }
+                order = getOrderById(id, connection);
                 connection.commit();
-            } catch (SQLException | OnlineStoreLogicalException e) {
-                order = null;
+                logger.info("The order was fetched from database: {}", order);
+            } catch (BackendLogicalException e) {
                 connection.rollback();
-                e.printStackTrace();
-            } finally {
-                if (resultSet != null) {
-                    resultSet.close();
-                }
-                if (preparedStatement != null) {
-                    preparedStatement.close();
-                }
+                logger.error("The order wasn't fetched from database", e);
+                throw e;
+            } catch (SQLException e) {
+                connection.rollback();
+                logger.error("SQLException", e);
+                throw new DatabaseException("SQLException", e);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("SQLException", e);
+            throw new DatabaseException("SQLException", e);
         }
         return order;
     }
 
     @Override
-    public boolean edit(Order entity) {
+    public boolean edit(Order entity) throws BackendException {
+        logger.info("Invoking of edit(Order entity): {}", entity);
         String sql = "UPDATE orders SET user_id = ?, total = ?, count = ?, shipping_id = ?, billing_id = ?, date = ? WHERE id = ?";
         try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(7, entity.getId());
@@ -228,68 +236,54 @@ public class OrderDAOImpl implements OrderDAO {
             preparedStatement.setLong(5, entity.getBilling().getId());
             preparedStatement.setTimestamp(6, new java.sql.Timestamp(entity.getDate().getTime()));
             if (preparedStatement.executeUpdate() == 0) {
-                throw new SQLException("Creating order is failed, no rows is affected! ");
+                logger.error("Updating the order is failed, no rows is affected");
+                throw new DatabaseException("Updating the order is failed, no rows is affected");
             }
+            logger.info("The order was updated");
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("SQLException", e);
+            throw new DatabaseException("SQLException", e);
         }
-        return false;
     }
 
+    // ENGINE = InnoDB and ON DELETE CASCADE are used in this project
     @Override
-    public boolean remove(Order entity) {
-        String sqlForOrderItem = "DELETE FROM order_items WHERE order_id = " + entity.getId();
-        String sqlForOrder = "DELETE FROM orders WHERE id = " + entity.getId();
-        Statement statement = null;
-        try (Connection connection = getConnection()) {
-            connection.setAutoCommit(false);
-            try {
-                statement = connection.createStatement();
-                statement.addBatch(sqlForOrderItem);
-                statement.addBatch(sqlForOrder);
-                if (statement.executeBatch().length == 0) {
-                    throw new SQLException("Deleting order is failed! ");
-                }
-                connection.commit();
-                return true;
-            } catch (SQLException e) {
-                connection.rollback();
-                e.printStackTrace();
+    public boolean remove(Order entity) throws BackendException {
+        logger.info("Invoking of remove(Order entity): {}", entity);
+        String sql = "DELETE FROM orders WHERE id = " + entity.getId();
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            if (preparedStatement.executeUpdate() == 0) {
+                logger.error("Deleting the order is failed, no rows is affected");
+                throw new DatabaseException("Deleting the order is failed, no rows is affected");
             }
+            logger.info("The order was deleted successfully");
+            return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (statement != null){
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            logger.error("Deleting the order is failed", e);
+            throw new DatabaseException("Deleting order is failed", e);
         }
-        return false;
     }
 
 
-    public static Order getOrderById(long id, Connection connection, PreparedStatement preparedStatement
-            , ResultSet resultSet) throws SQLException, OnlineStoreLogicalException {
+    static Order getOrderById(long id, Connection connection) throws SQLException, BackendLogicalException {
         String sql = "SELECT id, user_id, total, count, shipping_id, billing_id, date FROM orders WHERE id = " + id;
         Order order = null;
-        preparedStatement = connection.prepareStatement(sql);
-        resultSet = preparedStatement.executeQuery();
-        if (resultSet.next()) {
-            order = new Order();
-            order.setId(resultSet.getLong("id"));
-            long userId = resultSet.getLong("user_id");
-            order.setTotal(resultSet.getDouble("total"));
-            order.setCount(resultSet.getInt("count"));
-            order.setDate(new java.util.Date(resultSet.getTimestamp("date").getTime()));
-            long shipping = resultSet.getLong("shipping_id");
-            long billing = resultSet.getLong("billing_id");
-            order.setShipping(getAddressById(shipping, connection, preparedStatement, resultSet));
-            order.setBilling(getAddressById(billing, connection, preparedStatement, resultSet));
-            order.setUser(getUserById(userId, connection, preparedStatement, resultSet));
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)
+             ; ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                order = new Order();
+                order.setId(resultSet.getLong("id"));
+                long userId = resultSet.getLong("user_id");
+                order.setTotal(resultSet.getDouble("total"));
+                order.setCount(resultSet.getInt("count"));
+                order.setDate(new java.util.Date(resultSet.getTimestamp("date").getTime()));
+                long shipping = resultSet.getLong("shipping_id");
+                long billing = resultSet.getLong("billing_id");
+                order.setShipping(getAddressById(shipping, connection));
+                order.setBilling(getAddressById(billing, connection));
+                order.setUser(getUserById(userId, connection));
+            }
         }
         return order;
     }

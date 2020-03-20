@@ -3,10 +3,15 @@ package org.astashonok.onlinestorebackend.daoImpl;
 import org.astashonok.onlinestorebackend.dao.CartDAO;
 import org.astashonok.onlinestorebackend.dto.Cart;
 import org.astashonok.onlinestorebackend.dto.User;
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.technicalexception.DatabaseException;
+import org.astashonok.onlinestorebackend.util.ClassName;
 import org.astashonok.onlinestorebackend.util.pool.Pool;
 import org.astashonok.onlinestorebackend.util.pool.PoolWithDataSource;
 import org.astashonok.onlinestorebackend.util.pool.Pools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 
@@ -15,6 +20,7 @@ import static org.astashonok.onlinestorebackend.daoImpl.UserDAOImpl.getUserById;
 public class CartDAOImpl implements CartDAO {
 
     private Pool pool;
+    private static final Logger logger = LoggerFactory.getLogger(ClassName.getCurrentClassName());
 
     public CartDAOImpl(Pool pool) {
         this.pool = pool;
@@ -33,7 +39,8 @@ public class CartDAOImpl implements CartDAO {
     }
 
     @Override
-    public Cart getByUser(User user) {
+    public Cart getByUser(User user) throws BackendException {
+        logger.info("Invoking of getByUser(User user) method: {}", user);
         String sql = "SELECT id, total, cart_items FROM carts WHERE id = " + user.getId();
         Cart cart = null;
         try (Connection connection = getConnection()
@@ -45,9 +52,13 @@ public class CartDAOImpl implements CartDAO {
                 cart.setTotal(resultSet.getDouble("total"));
                 cart.setCartItems(resultSet.getInt("cart_items"));
             }
-        } catch (OnlineStoreLogicalException | SQLException e) {
-            cart = null;
-            e.printStackTrace();
+            logger.info("The cart was fetched from database: {}", cart);
+        } catch (BackendLogicalException e) {
+            logger.error("No cart was fetched from database", e);
+            throw e;
+        } catch (SQLException e) {
+            logger.error("SQLException", e);
+            throw new DatabaseException("SQLException", e);
         }
         return cart;
     }
@@ -55,81 +66,72 @@ public class CartDAOImpl implements CartDAO {
     @Override
     public long add(Cart entity) {
         //ignore
-        throw new IllegalStateException("Cart is added automatically when the user is created");
+        throw new IllegalStateException("The cart is added automatically when the user is created");
     }
 
     @Override
-    public Cart getById(long id) {
-        String sql = "SELECT id, total, cart_items FROM carts WHERE id = " + id;
-        Cart cart = null;
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
+    public Cart getById(long id) throws BackendException {
+        logger.info("Invoking of getById(long id), id = {}", id);
+        Cart cart;
         try (Connection connection = getConnection()) {
-            //transaction execution
             connection.setAutoCommit(false);
             try {
-                preparedStatement = connection.prepareStatement(sql);
-                resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    cart = new Cart();
-                    cart.setTotal(resultSet.getDouble("total"));
-                    cart.setCartItems(resultSet.getInt("cart_items"));
-                    cart.setUser(getUserById(id, connection, preparedStatement, resultSet));
-                    connection.commit();
-                }
-            } catch (SQLException | OnlineStoreLogicalException e) {
-                cart = null;
+                cart = getCartById(id, connection);
+                connection.commit();
+                logger.info("The cart was fetched from database: {}", cart);
+            } catch (BackendLogicalException e) {
                 connection.rollback();
-                e.printStackTrace();
-            } finally {
-                if (resultSet != null) {
-                    resultSet.close();
-                }
-                if (preparedStatement != null) {
-                    preparedStatement.close();
-                }
+                logger.error("The address wasn't fetched from database", e);
+                throw e;
+            } catch (SQLException e) {
+                connection.rollback();
+                logger.error("SQLException", e);
+                throw new DatabaseException("SQLException", e);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("SQLException", e);
+            throw new DatabaseException("SQLException", e);
         }
         return cart;
     }
 
     @Override
-    public boolean edit(Cart entity) {
+    public boolean edit(Cart entity) throws BackendException {
+        logger.info("Invoking of edit(Cart entity): {}", entity);
         String sql = "UPDATE carts SET total = ?, cart_items = ? WHERE id = ?";
         try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(3, entity.getId());
             preparedStatement.setDouble(1, entity.getTotal());
             preparedStatement.setInt(2, entity.getCartItems());
-            if (preparedStatement.executeUpdate() == 0){
-                throw new SQLException("Creating cart is failed, no rows is affected! ");
+            if (preparedStatement.executeUpdate() == 0) {
+                logger.error("Updating the cart is failed, no rows is affected");
+                throw new DatabaseException("Updating the cart is failed, no rows is affected");
             }
+            logger.info("The cart was updated");
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException("SQLException", e);
         }
-        return false;
     }
 
     @Override
     public boolean remove(Cart entity) {
         //ignore
-        throw new IllegalStateException("Cart is deleted automatically when the user is deleted");
+        throw new IllegalStateException("The cart is deleted automatically when the user is deleted");
     }
 
 
-    public static Cart getCartById(long id, Connection connection, PreparedStatement preparedStatement
-            , ResultSet resultSet) throws SQLException, OnlineStoreLogicalException {
+    static Cart getCartById(long id, Connection connection) throws SQLException, BackendLogicalException {
         String sql = "SELECT id, total, cart_items FROM carts WHERE id = " + id;
         Cart cart = null;
-        preparedStatement = connection.prepareStatement(sql);
-        resultSet = preparedStatement.executeQuery();
-        if (resultSet.next()) {
-            cart = new Cart();
-            cart.setTotal(resultSet.getDouble("total"));
-            cart.setCartItems(resultSet.getInt("cart_items"));
-            cart.setUser(getUserById(id, connection, preparedStatement, resultSet));
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)
+             ; ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                cart = new Cart();
+                cart.setTotal(resultSet.getDouble("total"));
+                cart.setCartItems(resultSet.getInt("cart_items"));
+                cart.setUser(getUserById(id, connection));
+            }
         }
         return cart;
     }

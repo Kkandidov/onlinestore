@@ -1,13 +1,13 @@
 package org.astashonok.onlinestorebackend.dto;
 
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.product2;
+import static org.astashonok.onlinestorebackend.testconfig.StaticTestInitializer.product2;
 import static org.junit.Assert.*;
 
 public class ViewTest {
@@ -27,19 +27,19 @@ public class ViewTest {
 
     // if the reference to code is null
     @Test(expected = NullReferenceException.class)
-    public void setCodeIsNull() throws OnlineStoreLogicalException {
+    public void setCodeIsNull() throws BackendLogicalException {
         view.setCode(null);
     }
 
     // if the reference to code is empty
     @Test(expected = EmptyFieldException.class)
-    public void setCodeIsEmpty() throws OnlineStoreLogicalException {
+    public void setCodeIsEmpty() throws BackendLogicalException {
         view.setCode("");
     }
 
     // if the reference to code is correct
     @Test
-    public void setCode() throws OnlineStoreLogicalException {
+    public void setCode() throws BackendLogicalException {
         view.setCode("PRD1581866965493");
         String expected = "PRD1581866965493";
         String actual = view.getCode();

@@ -4,18 +4,19 @@ import org.astashonok.onlinestorebackend.dao.abstracts.EntityDAO;
 import org.astashonok.onlinestorebackend.dto.Cart;
 import org.astashonok.onlinestorebackend.dto.CartItem;
 import org.astashonok.onlinestorebackend.dto.Product;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendException;
 
 import java.util.List;
 
 public interface CartItemDAO extends EntityDAO<CartItem> {
 
     // read
-    List<CartItem> getByCart(Cart cart);
+    List<CartItem> getByCart(Cart cart) throws BackendException;
 
-    List<CartItem> getAvailableByCart(Cart cart);
+    List<CartItem> getAvailableByCart(Cart cart) throws BackendException;
 
-    List<CartItem> getByProduct(Product product);
+    List<CartItem> getByProduct(Product product) throws BackendException;
 
-    CartItem getByCartAndProduct(Cart cart, Product product);
+    CartItem getByCartAndProduct(Cart cart, Product product) throws BackendException;
 
 }

@@ -35,6 +35,7 @@ public class Description extends Entity {
         this.displayTechnology = displayTechnology;
         this.graphics = graphics;
         this.wirelessCommunication = wirelessCommunication;
+        super.id = product.getId();
     }
 
     public Product getProduct() {

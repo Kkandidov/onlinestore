@@ -1,61 +1,56 @@
 package org.astashonok.onlinestorebackend.daoImpl;
 
 import org.astashonok.onlinestorebackend.dto.Cart;
-import org.astashonok.onlinestorebackend.dto.User;
-import org.astashonok.onlinestorebackend.exceptions.logicalexception.NegativeValueException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendException;
 import org.astashonok.onlinestorebackend.testconfig.SimpleSingleConnection;
-import org.astashonok.onlinestorebackend.util.pool.Pools;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
-import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.cart2;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import static org.astashonok.onlinestorebackend.testconfig.StaticTestInitializer.*;
 import static org.junit.Assert.*;
 
 public class CartDAOImplTest {
 
-    private static CartDAOImpl cartDAO;
-    private static UserDAOImpl userDAO;
-
-    @BeforeClass
-    public static void init() {
-        System.out.println("Initialization of our object! ");
-        cartDAO = new CartDAOImpl(Pools.newPool(SimpleSingleConnection.class));
-        userDAO = new UserDAOImpl(Pools.newPool(SimpleSingleConnection.class));
-    }
-
-    @AfterClass
-    public static void destroy() {
-        System.out.println("Destruction of our object! ");
-        cartDAO = null;
-        userDAO = null;
+    @After
+    public void resetDatabase() throws SQLException {
+        System.out.println("Reset database...");
+        Connection connection = SimpleSingleConnection.getInstance().getConnection();
+        connection.setAutoCommit(false);
+        Statement statement = connection.createStatement();
+        statement.addBatch("SET FOREIGN_KEY_CHECKS=0");
+        statement.addBatch("TRUNCATE TABLE carts");
+        statement.addBatch("SET FOREIGN_KEY_CHECKS=1");
+        statement.addBatch("INSERT INTO carts(id, total, cart_items) VALUES(2, 1510, 2)");
+        statement.addBatch("INSERT INTO carts(id, total, cart_items) VALUES(3, 1029, 1)");
+        statement.executeBatch();
+        connection.commit();
+        System.out.println("Resetting is successfully!");
     }
 
     @Test
-    public void getByUser() {
+    public void getByUser() throws BackendException {
         Cart expected = cart2;
-        User user = userDAO.getById(2);
-        Cart actual = cartDAO.getByUser(user);
+        Cart actual = cartDAO.getByUser(user2);
         assertEquals(expected, actual);
     }
 
     @Test
-    public void getById() {
+    public void getById() throws BackendException {
         Cart expected = cart2;
         Cart actual = cartDAO.getById(2);
         assertEquals(expected, actual);
     }
 
     @Test
-    public void edit() throws NegativeValueException {
-        Cart expected = cartDAO.getById(2);
+    public void edit() throws BackendException {
+        Cart expected = cart2;
         expected.setTotal(12000);
-        assertTrue(cartDAO.edit(expected));
+        cartDAO.edit(expected);
         Cart actual = cartDAO.getById(2);
         assertEquals(expected, actual);
-
-        // database reset
-        expected.setTotal(1510.00);
-        assertTrue(cartDAO.edit(expected));
+        expected.setTotal(1510);
     }
 }

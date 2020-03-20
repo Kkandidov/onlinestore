@@ -1,6 +1,6 @@
 package org.astashonok.onlinestorebackend.dto;
 
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NegativeValueException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
@@ -8,8 +8,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.brand3;
-import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.category1;
+import static org.astashonok.onlinestorebackend.testconfig.StaticTestInitializer.brand3;
+import static org.astashonok.onlinestorebackend.testconfig.StaticTestInitializer.category1;
 import static org.junit.Assert.*;
 
 public class ProductTest {
@@ -30,19 +30,19 @@ public class ProductTest {
 
     // if the reference to name is null
     @Test(expected = NullReferenceException.class)
-    public void setNameIsNull() throws OnlineStoreLogicalException {
+    public void setNameIsNull() throws BackendLogicalException {
         product.setName(null);
     }
 
     // if the reference to name is empty
     @Test(expected = EmptyFieldException.class)
-    public void setNameIsEmpty() throws OnlineStoreLogicalException {
+    public void setNameIsEmpty() throws BackendLogicalException {
         product.setName("");
     }
 
     // if the reference to name is correct
     @Test
-    public void setName() throws OnlineStoreLogicalException {
+    public void setName() throws BackendLogicalException {
         product.setName("HONOR 20 international version");
         String expected = "HONOR 20 international version";
         String actual = product.getName();
@@ -51,19 +51,19 @@ public class ProductTest {
 
     // if the reference to code is null
     @Test(expected = NullReferenceException.class)
-    public void setCodeIsNull() throws OnlineStoreLogicalException {
+    public void setCodeIsNull() throws BackendLogicalException {
         product.setCode(null);
     }
 
     // if the reference to code is empty
     @Test(expected = EmptyFieldException.class)
-    public void setCodeIsEmpty() throws OnlineStoreLogicalException {
+    public void setCodeIsEmpty() throws BackendLogicalException {
         product.setCode("");
     }
 
     // if the reference to code is correct
     @Test
-    public void setCode() throws OnlineStoreLogicalException {
+    public void setCode() throws BackendLogicalException {
         product.setCode("MAIN1581865663258");
         String expected = "MAIN1581865663258";
         String actual = product.getCode();

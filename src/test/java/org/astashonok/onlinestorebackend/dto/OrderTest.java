@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.*;
+import static org.astashonok.onlinestorebackend.testconfig.StaticTestInitializer.*;
 import static org.junit.Assert.*;
 
 public class OrderTest {

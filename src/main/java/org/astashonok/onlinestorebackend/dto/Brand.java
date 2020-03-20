@@ -1,7 +1,7 @@
 package org.astashonok.onlinestorebackend.dto;
 
 import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 
@@ -37,7 +37,7 @@ public class Brand extends Entity {
         return name;
     }
 
-    public void setName(String name) throws OnlineStoreLogicalException {
+    public void setName(String name) throws BackendLogicalException {
         if (name == null) {
             throw new NullReferenceException("The name must be indicated in the brand! ");
         }
@@ -77,6 +77,7 @@ public class Brand extends Entity {
                 super.toString() +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", active=" + active +
                 '}';
     }
 

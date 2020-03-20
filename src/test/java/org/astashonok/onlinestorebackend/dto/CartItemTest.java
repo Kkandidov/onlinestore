@@ -6,8 +6,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.cart2;
-import static org.astashonok.onlinestorebackend.testconfig.StaticInitializerDTO.product1;
+import static org.astashonok.onlinestorebackend.testconfig.StaticTestInitializer.cart2;
+import static org.astashonok.onlinestorebackend.testconfig.StaticTestInitializer.product1;
 import static org.junit.Assert.*;
 
 public class CartItemTest {

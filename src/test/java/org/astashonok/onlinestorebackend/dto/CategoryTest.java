@@ -1,6 +1,6 @@
 package org.astashonok.onlinestorebackend.dto;
 
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
 import org.junit.AfterClass;
@@ -27,19 +27,19 @@ public class CategoryTest {
 
     // if the reference to name is empty
     @Test(expected = EmptyFieldException.class)
-    public void setNameIsEmpty() throws OnlineStoreLogicalException {
+    public void setNameIsEmpty() throws BackendLogicalException {
         category.setName("");
     }
 
     // if the reference to name is null
     @Test(expected = NullReferenceException.class)
-    public void setNameNullReference() throws OnlineStoreLogicalException {
+    public void setNameNullReference() throws BackendLogicalException {
         category.setName(null);
     }
 
     // if the reference to is correct
     @Test
-    public void setName() throws OnlineStoreLogicalException {
+    public void setName() throws BackendLogicalException {
         category.setName("Mobile phone");
         String expected = "Mobile phone";
         String actual = category.getName();

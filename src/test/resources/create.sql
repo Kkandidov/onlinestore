@@ -41,7 +41,7 @@ CREATE TABLE users(
 	role_id			INT 			NOT NULL,
 
 	CONSTRAINT	pk_users_id			PRIMARY KEY	(id),
-	CONSTRAINT	fk_users_role_id	FOREIGN KEY (role_id)	REFERENCES	roles	(id),
+	CONSTRAINT	fk_users_role_id	FOREIGN KEY (role_id)	REFERENCES	roles	(id)	ON DELETE CASCADE,
 	UNIQUE (email)
 )ENGINE = InnoDB;
 
@@ -59,7 +59,7 @@ CREATE TABLE addresses(
 	shipping	BOOLEAN,
 
 	CONSTRAINT	pk_addresses_id			PRIMARY KEY	(id),
-	CONSTRAINT	fk_addresses_user_id	FOREIGN KEY (user_id)	REFERENCES	users	(id)
+	CONSTRAINT	fk_addresses_user_id	FOREIGN KEY (user_id)	REFERENCES	users	(id)	ON DELETE CASCADE	
 )ENGINE = InnoDB;
 
 -- products table
@@ -74,8 +74,8 @@ CREATE TABLE products(
 	category_id	INT 			NOT NULL,
 
 	CONSTRAINT	pk_products_id			PRIMARY KEY	(id),
-	CONSTRAINT	fk_products_brand_id	FOREIGN KEY	(brand_id)		REFERENCES	brands		(id),
-	CONSTRAINT	fk_products_category_id	FOREIGN KEY	(category_id)	REFERENCES	categories	(id)
+	CONSTRAINT	fk_products_brand_id	FOREIGN KEY	(brand_id)		REFERENCES	brands		(id)	ON DELETE CASCADE,
+	CONSTRAINT	fk_products_category_id	FOREIGN KEY	(category_id)	REFERENCES	categories	(id)	ON DELETE CASCADE
 )ENGINE = InnoDB;
 
 -- descriptions table
@@ -93,7 +93,7 @@ CREATE TABLE descriptions(
 	wireless_communication	VARCHAR(50),
 
 	CONSTRAINT	pk_descriptions_id	PRIMARY KEY	(id),
-	CONSTRAINT	fk_descriptions_id	FOREIGN KEY (id)	REFERENCES	products	(id)
+	CONSTRAINT	fk_descriptions_id	FOREIGN KEY (id)	REFERENCES	products	(id)	ON DELETE CASCADE
 )ENGINE = InnoDB;
 
 -- views table
@@ -103,7 +103,7 @@ CREATE TABLE views(
 	product_id	INT			NOT NULL,
 
 	CONSTRAINT	pk_views_id			PRIMARY KEY	(id),
-	CONSTRAINT	fk_views_product_id	FOREIGN KEY (product_id)	REFERENCES	products	(id)
+	CONSTRAINT	fk_views_product_id	FOREIGN KEY (product_id)	REFERENCES	products	(id)	ON DELETE CASCADE
 )ENGINE = InnoDB;
 
 -- carts table
@@ -113,7 +113,7 @@ CREATE TABLE carts(
 	cart_items	INT,
 
 	CONSTRAINT	pk_carts_id	PRIMARY KEY	(id),
-	CONSTRAINT	fk_carts_id	FOREIGN KEY (id)	REFERENCES	users	(id)
+	CONSTRAINT	fk_carts_id	FOREIGN KEY (id)	REFERENCES	users	(id)	ON DELETE CASCADE
 )ENGINE = InnoDB;
 
 -- cart_items table
@@ -127,8 +127,8 @@ CREATE TABLE cart_items(
 	available		BOOLEAN,
 
 	CONSTRAINT	pk_cart_items_id			PRIMARY KEY	(id),
-	CONSTRAINT	fk_cart_items_cart_id		FOREIGN KEY	(cart_id)		REFERENCES	carts		(id),
-	CONSTRAINT	fk_cart_items_product_id	FOREIGN KEY	(product_id)	REFERENCES	products	(id)
+	CONSTRAINT	fk_cart_items_cart_id		FOREIGN KEY	(cart_id)		REFERENCES	carts		(id)	ON DELETE CASCADE,
+	CONSTRAINT	fk_cart_items_product_id	FOREIGN KEY	(product_id)	REFERENCES	products	(id)	ON DELETE CASCADE
 )ENGINE = InnoDB;
 -- orders table
 CREATE TABLE orders(
@@ -141,9 +141,9 @@ CREATE TABLE orders(
 	date 			DATETIME		NOT NULL,
 
 	CONSTRAINT	pk_orders_id			PRIMARY KEY	(id),
-	CONSTRAINT	fk_orders_user_id		FOREIGN KEY	(user_id)		REFERENCES	users		(id),
-	CONSTRAINT 	fk_orders_shipping_id 	FOREIGN KEY (shipping_id) 	REFERENCES 	addresses 	(id),
-	CONSTRAINT 	fk_orders_billing_id	FOREIGN KEY (billing_id) 	REFERENCES 	addresses 	(id)
+	CONSTRAINT	fk_orders_user_id		FOREIGN KEY	(user_id)		REFERENCES	users		(id)	ON DELETE CASCADE,
+	CONSTRAINT 	fk_orders_shipping_id 	FOREIGN KEY (shipping_id) 	REFERENCES 	addresses 	(id)	ON DELETE CASCADE,
+	CONSTRAINT 	fk_orders_billing_id	FOREIGN KEY (billing_id) 	REFERENCES 	addresses 	(id)	ON DELETE CASCADE
 )ENGINE = InnoDB;
 
 -- order_items table
@@ -156,6 +156,6 @@ CREATE TABLE order_items(
 	product_price	DECIMAL(10,2),
 
 	CONSTRAINT	pk_order_items_id			PRIMARY KEY	(id),
-	CONSTRAINT	fk_order_items_order_id		FOREIGN KEY (order_id)		REFERENCES orders	(id),
-	CONSTRAINT	fk_order_items_product_id	FOREIGN KEY (product_id)	REFERENCES products (id)
+	CONSTRAINT	fk_order_items_order_id		FOREIGN KEY (order_id)		REFERENCES orders	(id)	ON DELETE CASCADE,
+	CONSTRAINT	fk_order_items_product_id	FOREIGN KEY (product_id)	REFERENCES products (id)	ON DELETE CASCADE
 )ENGINE = InnoDB;
