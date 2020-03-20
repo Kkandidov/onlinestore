@@ -1,8 +1,8 @@
 package org.astashonok.onlinestorebackend.exceptions.logicalexception;
 
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 
-public class NegativeValueException extends OnlineStoreLogicalException {
+public class NegativeValueException extends BackendLogicalException {
     public NegativeValueException() {
         super();
     }

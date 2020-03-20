@@ -1,19 +1,19 @@
 package org.astashonok.onlinestorebackend.exceptions.basicexception;
 
-public class OnlineStoreLogicalException extends OnlineStoreException {
-    public OnlineStoreLogicalException() {
+public class BackendLogicalException extends BackendException {
+    public BackendLogicalException() {
         super();
     }
 
-    public OnlineStoreLogicalException(String msg) {
+    public BackendLogicalException(String msg) {
         super(msg);
     }
 
-    public OnlineStoreLogicalException(Throwable cause) {
+    public BackendLogicalException(Throwable cause) {
         super(cause);
     }
 
-    public OnlineStoreLogicalException(String message, Throwable cause) {
+    public BackendLogicalException(String message, Throwable cause) {
         super(message, cause);
     }
 }

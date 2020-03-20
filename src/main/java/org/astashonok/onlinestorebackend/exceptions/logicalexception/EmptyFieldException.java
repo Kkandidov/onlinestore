@@ -1,8 +1,8 @@
 package org.astashonok.onlinestorebackend.exceptions.logicalexception;
 
-import org.astashonok.onlinestorebackend.exceptions.basicexception.OnlineStoreLogicalException;
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 
-public class EmptyFieldException extends OnlineStoreLogicalException {
+public class EmptyFieldException extends BackendLogicalException {
     public EmptyFieldException() {
         super();
     }
