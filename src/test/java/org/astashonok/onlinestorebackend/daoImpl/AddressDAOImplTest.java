@@ -22,6 +22,8 @@ public class AddressDAOImplTest {
         Statement statement = connection.createStatement();
         statement.addBatch("SET FOREIGN_KEY_CHECKS=0");
         statement.addBatch("TRUNCATE TABLE addresses");
+        statement.addBatch("TRUNCATE TABLE orders");
+        statement.addBatch("TRUNCATE TABLE order_items");
         statement.addBatch("SET FOREIGN_KEY_CHECKS=1");
         statement.addBatch("INSERT INTO addresses(user_id, line_one, line_two, city, state, country, postal_code, "
                 + "billing, shipping) VALUES(2, 'Platonov street', '', 'Minsk', 'Minsk', 'Belarus', '220034', false, true)");
@@ -31,6 +33,16 @@ public class AddressDAOImplTest {
                 + "billing, shipping) VALUES(2, 'Platonov street', '', 'Minsk', 'Minsk', 'Belarus', '220034', true, false)");
         statement.addBatch("INSERT INTO addresses(user_id, line_one, line_two, city, state, country, postal_code, "
                 + "billing, shipping) VALUES(3, 'Serdich street', '', 'Minsk', 'Minsk', 'Belarus', '220035', true, false)");
+        statement.addBatch("INSERT INTO orders(user_id, total, count, shipping_id, billing_id, date)"
+                + "VALUES(2, 1510, 3, 1, 3, '2020-03-03 10:37:22')");
+        statement.addBatch("INSERT INTO orders(user_id, total, count, shipping_id, billing_id, date)"
+                + "VALUES(3, 1029, 3, 2, 4, '2020-03-05 13:35:21')");
+        statement.addBatch("INSERT INTO order_items(order_id, total, product_id, product_count, product_price)"
+                + "VALUES(1, 800, 1, 2, 400)");
+        statement.addBatch("INSERT INTO order_items(order_id, total, product_id, product_count, product_price)"
+                + "VALUES(1, 710, 2, 1, 710)");
+        statement.addBatch("INSERT INTO order_items(order_id, total, product_id, product_count, product_price)"
+                + "VALUES(2, 1029, 3, 3, 343)");
         statement.executeBatch();
         connection.commit();
         System.out.println("Resetting is successfully!");
@@ -71,11 +83,12 @@ public class AddressDAOImplTest {
 
     @Test
     public void edit() throws BackendException {
-        Address address = address12;
-        address.setCountry("Russia");
-        addressDAO.edit(address);
-        assertEquals("Russia", addressDAO.getById(3).getCountry());
-        address.setCountry("Belarus");
+        Address expected = address12;
+        expected.setCountry("Russia");
+        addressDAO.edit(expected);
+        Address actual = addressDAO.getById(3);
+        assertEquals(expected, actual);
+        expected.setCountry("Belarus");
     }
 
     @Test

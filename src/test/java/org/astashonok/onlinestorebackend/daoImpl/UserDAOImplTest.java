@@ -22,6 +22,11 @@ public class UserDAOImplTest {
         Statement statement = connection.createStatement();
         statement.addBatch("SET FOREIGN_KEY_CHECKS=0");
         statement.addBatch("TRUNCATE TABLE users");
+        statement.addBatch("TRUNCATE TABLE carts");
+        statement.addBatch("TRUNCATE TABLE cart_items");
+        statement.addBatch("TRUNCATE TABLE addresses");
+        statement.addBatch("TRUNCATE TABLE orders");
+        statement.addBatch("TRUNCATE TABLE order_items");
         statement.addBatch("SET FOREIGN_KEY_CHECKS=1");
         statement.addBatch("INSERT INTO users(first_name, last_name, email, password, contact_number, enabled, role_id) "
                 + "VALUES('Ivan', 'Ivanov', 'ivan@gmail.com', '$2y$12$i5iA/3OVxdeVLB4h5ttOSecMkd1E0Vj9ywhjL449OuemuD09buJvS'"
@@ -32,7 +37,33 @@ public class UserDAOImplTest {
         statement.addBatch("INSERT INTO users(first_name, last_name, email, password, contact_number, enabled, role_id) "
                 + "VALUES('Sergey', 'Sergeev', 'sergey@gmail.com', '$2y$12$ZSE/h0gS.Mg.qZnuwzfCxuBd3D1qH3KeY4wL9qZEcAt0FQYNRrBIO'"
                 + ", '+375-29-654-32-45', true, 2)");
+        statement.addBatch("INSERT INTO carts(id, total, cart_items) VALUES(2, 1510, 2)");
+        statement.addBatch("INSERT INTO carts(id, total, cart_items) VALUES(3, 1029, 1)");
         statement.addBatch("DELETE FROM carts WHERE id = 4");
+        statement.addBatch("INSERT INTO cart_items(cart_id, total, product_id, product_count, product_price, available)"
+                + "VALUES(2, 800, 1, 2, 400, true)");
+        statement.addBatch("INSERT INTO cart_items(cart_id, total, product_id, product_count, product_price, available)"
+                + "VALUES(2, 710, 2, 1, 710, true)");
+        statement.addBatch("INSERT INTO cart_items(cart_id, total, product_id, product_count, product_price, available)"
+                + "VALUES(3, 1029, 3, 3, 343, true)");
+        statement.addBatch("INSERT INTO addresses(user_id, line_one, line_two, city, state, country, postal_code, "
+                + "billing, shipping) VALUES(2, 'Platonov street', '', 'Minsk', 'Minsk', 'Belarus', '220034', false, true)");
+        statement.addBatch("INSERT INTO addresses(user_id, line_one, line_two, city, state, country, postal_code, "
+                + "billing, shipping) VALUES(3, 'Serdich street', '', 'Minsk', 'Minsk', 'Belarus', '220035', false, true)");
+        statement.addBatch("INSERT INTO addresses(user_id, line_one, line_two, city, state, country, postal_code, "
+                + "billing, shipping) VALUES(2, 'Platonov street', '', 'Minsk', 'Minsk', 'Belarus', '220034', true, false)");
+        statement.addBatch("INSERT INTO addresses(user_id, line_one, line_two, city, state, country, postal_code, "
+                + "billing, shipping) VALUES(3, 'Serdich street', '', 'Minsk', 'Minsk', 'Belarus', '220035', true, false)");
+        statement.addBatch("INSERT INTO orders(user_id, total, count, shipping_id, billing_id, date)"
+                + "VALUES(2, 1510, 3, 1, 3, '2020-03-03 10:37:22')");
+        statement.addBatch("INSERT INTO orders(user_id, total, count, shipping_id, billing_id, date)"
+                + "VALUES(3, 1029, 3, 2, 4, '2020-03-05 13:35:21')");
+        statement.addBatch("INSERT INTO order_items(order_id, total, product_id, product_count, product_price)"
+                + "VALUES(1, 800, 1, 2, 400)");
+        statement.addBatch("INSERT INTO order_items(order_id, total, product_id, product_count, product_price)"
+                + "VALUES(1, 710, 2, 1, 710)");
+        statement.addBatch("INSERT INTO order_items(order_id, total, product_id, product_count, product_price)"
+                + "VALUES(2, 1029, 3, 3, 343)");
         statement.executeBatch();
         connection.commit();
         System.out.println("Resetting is successfully!");
