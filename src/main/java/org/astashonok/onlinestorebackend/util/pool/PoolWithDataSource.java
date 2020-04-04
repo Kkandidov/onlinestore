@@ -13,7 +13,7 @@ public class PoolWithDataSource implements Pool {
     private PoolWithDataSource(){
         try{
             Context context = new InitialContext();
-            dataSource = (DataSource) context.lookup("java:comp/env/jdbc/webApplication");
+            dataSource = (DataSource) context.lookup("java:comp/env/jdbc/DataSource");
         } catch (NamingException e){
             e.printStackTrace();
         }

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="addressDAO"
+        class="org.astashonok.onlinestorebackend.daoImpl.AddressDAOImpl"
+        scope="prototype"/>
+
+    <bean id="brandDAO"
+          class="org.astashonok.onlinestorebackend.daoImpl.BrandDAOImpl"
+          scope="prototype"/>
+
+    <bean id="cartDAO"
+          class="org.astashonok.onlinestorebackend.daoImpl.CartDAOImpl"
+          scope="prototype"/>
+
+    <bean id="cartItemDAO"
+          class="org.astashonok.onlinestorebackend.daoImpl.CartItemDAOImpl"
+          scope="prototype"/>
+
+    <bean id="categoryDAO"
+          class="org.astashonok.onlinestorebackend.daoImpl.CategoryDAOImpl"
+          scope="prototype"/>
+
+    <bean id="descriptionDAO"
+          class="org.astashonok.onlinestorebackend.daoImpl.DescriptionDAOImpl"
+          scope="prototype"/>
+
+    <bean id="orderDAO"
+          class="org.astashonok.onlinestorebackend.daoImpl.OrderDAOImpl"
+          scope="prototype"/>
+
+    <bean id="orderItemDAO"
+          class="org.astashonok.onlinestorebackend.daoImpl.OrderItemDAOImpl"
+          scope="prototype"/>
+
+    <bean id="productDAO"
+          class="org.astashonok.onlinestorebackend.daoImpl.ProductDAOImpl"
+          scope="prototype"/>
+
+    <bean id="roleDAO"
+          class="org.astashonok.onlinestorebackend.daoImpl.RoleDAOImpl"
+          scope="prototype"/>
+
+    <bean id="userDAO"
+          class="org.astashonok.onlinestorebackend.daoImpl.UserDAOImpl"
+          scope="prototype"/>
+
+    <bean id="viewDAO"
+          class="org.astashonok.onlinestorebackend.daoImpl.ViewDAOImpl"
+          scope="prototype"/>
+</beans>

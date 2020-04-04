@@ -85,6 +85,7 @@ public class BrandDAOImplTest {
         brandDAO.edit(expected);
         Brand actual = brandDAO.getById(10);
         assertEquals(expected, actual);
+        expected.setName("Honor");
     }
 
     @Test

@@ -43,7 +43,6 @@ public class CategoryDAOImpl implements CategoryDAO {
         return get("SELECT id, name, active FROM categories");
     }
 
-
     @Override
     public List<Category> getAllActive() throws BackendException {
         logger.info("Invoking of getAllActive() method");
