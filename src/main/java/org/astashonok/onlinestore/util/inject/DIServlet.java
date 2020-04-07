@@ -1,4 +1,4 @@
-package org.astashonok.onlinestore.inject;
+package org.astashonok.onlinestore.util.inject;
 
 import org.astashonok.onlinestore.util.ClassName;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public class DIServlet extends HttpServlet {
             // load AppContext
             ApplicationContext appCtx = new ClassPathXmlApplicationContext(appCtxPath);
             // then we inject from ApplicationContext all the fields marked by @Inject
-            List<Field> allFields = FieldReflector.collectUpTo(this.getClass());
+            List<Field> allFields = FieldReflector.collectUpTo(this.getClass(), DIServlet.class);
             List<Field> injectFields = FieldReflector.filterInject(allFields);
             logger.debug("{} :: injectFields: {}", this.getClass().getSimpleName(), injectFields);
             for (Field field : injectFields) {

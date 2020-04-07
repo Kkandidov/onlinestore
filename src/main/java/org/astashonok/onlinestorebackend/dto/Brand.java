@@ -4,6 +4,7 @@ import org.astashonok.onlinestorebackend.dto.abstracts.Entity;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
+import org.codehaus.jackson.annotate.JsonValue;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ public class Brand extends Entity {
         super.id = id;
     }
 
+    @JsonValue
     public String getName() {
         return name;
     }

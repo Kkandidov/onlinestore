@@ -1,4 +1,4 @@
-package org.astashonok.onlinestore.inject;
+package org.astashonok.onlinestore.util.inject;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

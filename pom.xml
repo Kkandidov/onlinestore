@@ -21,6 +21,7 @@
         <javaee-api.version>8.0.1</javaee-api.version>
         <jstl.version>1.2</jstl.version>
         <springframework.version>5.2.5.RELEASE</springframework.version>
+        <jersey.version>1.19.4</jersey.version>
     </properties>
 
     <dependencies>
@@ -119,7 +120,27 @@
             <version>${springframework.version}</version>
         </dependency>
 
+        <!-- dependencies for jersey -->
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-bundle</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
     </dependencies>
+
     <build>
         <plugins>
             <plugin>

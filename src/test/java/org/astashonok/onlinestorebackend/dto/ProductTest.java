@@ -1,15 +1,19 @@
 package org.astashonok.onlinestorebackend.dto;
 
+import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendException;
 import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogicalException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NegativeValueException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.astashonok.onlinestorebackend.testconfig.StaticTestInitializer.brand3;
-import static org.astashonok.onlinestorebackend.testconfig.StaticTestInitializer.category1;
+import java.io.IOException;
+import java.io.StringWriter;
+
+import static org.astashonok.onlinestorebackend.testconfig.StaticTestInitializer.*;
 import static org.junit.Assert.*;
 
 public class ProductTest {

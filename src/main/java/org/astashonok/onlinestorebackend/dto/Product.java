@@ -5,6 +5,7 @@ import org.astashonok.onlinestorebackend.exceptions.basicexception.BackendLogica
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.EmptyFieldException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NegativeValueException;
 import org.astashonok.onlinestorebackend.exceptions.logicalexception.NullReferenceException;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,12 +18,17 @@ public class Product extends Entity {
     private Brand brand;
     private double unitPrice;
     private int quantity;
+    @JsonIgnore
     private boolean active;
+    @JsonIgnore
     private Category category;
-
+    @JsonIgnore
     private Description description;
+    @JsonIgnore
     private Set<View> views;
+    @JsonIgnore
     private Set<CartItem> cartItems;
+    @JsonIgnore
     private Set<OrderItem> orderItems;
 
     public Product() {

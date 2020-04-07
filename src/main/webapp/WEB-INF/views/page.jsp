@@ -13,24 +13,65 @@
 
         <title>Online Store - ${title}</title>
 
+        <script>
+        	window.menu = '${title}';
+        	window.contextRoot = '${contextRoot}'
+        </script>
+
         <!-- Bootstrap core CSS -->
-        <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+        <link href="${contextRoot}/assets/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Bootstrap DataTable -->
+        <link href="${contextRoot}/assets/css/dataTables.bootstrap.css" rel="stylesheet">
 
         <!-- Custom styles for this template -->
-        <link href="assets/css/myapp.css" rel="stylesheet">
+        <link href="${contextRoot}/assets/css/myapp.css" rel="stylesheet">
     </head>
     <body>
-        <!-- Navigation -->
-        <%@include file="shared/navbar.jsp"%>
+        <div class="wrapper">
+            <!-- Navigation -->
+            <%@include file="shared/navbar.jsp"%>
 
-        <!-- Page Content -->
-        <%@include file="home.jsp"%>
+            <!-- Page Content -->
+                <div class="content">
+                    <!-- Loading the home content -->
+                    <c:if test="${homeClicked == true}">
+                        <%@include file="home.jsp"%>
+                    </c:if>
 
-        <!-- Footer -->
-        <%@include file="shared/footer.jsp"%>
+                    <!-- Loading only when user clicks about -->
+                    <c:if test="${aboutClicked == true}">
+                        <%@include file="about.jsp"%>
+                    </c:if>
 
-        <!-- Bootstrap core JavaScript -->
-        <script src="assets/jquery/jquery.min.js"></script>
-        <script src="assets/js/bootstrap.bundle.min.js"></script>
+                    <!-- Loading only when user clicks contact -->
+                    <c:if test="${contactClicked == true}">
+                        <%@include file="contact.jsp"%>
+                    </c:if>
+
+                    <!-- Loading only when user clicks view products -->
+                    <c:if test="${allProductsClicked == true or categoryProductsClicked == true}">
+                        <%@include file="listProducts.jsp"%>
+                    </c:if>
+                </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <%@include file="shared/footer.jsp"%>
+            </div>
+
+            <!-- Bootstrap core JavaScript -->
+            <script src="${contextRoot}/assets/js/jquery/jquery.min.js"></script>
+            <script src="${contextRoot}/assets/js/bootstrap.bundle.min.js"></script>
+
+            <!-- DataTable Plugin -->
+            <script src="${contextRoot}/assets/js/jquery/jquery.dataTables.js"></script>
+
+            <!-- DataTable Bootstrap Script -->
+            <script src="${contextRoot}/assets/js/dataTables.bootstrap.js"></script>
+
+           	<!-- Self coded javascript -->
+            <script src="${contextRoot}/assets/js/myapp.js"></script>
+        </div>
     </body>
 </html>
