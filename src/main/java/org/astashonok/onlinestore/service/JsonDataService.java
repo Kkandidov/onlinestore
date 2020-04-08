@@ -1,5 +1,4 @@
 package org.astashonok.onlinestore.service;
-
 import org.astashonok.onlinestorebackend.dao.ProductDAO;
 import org.astashonok.onlinestorebackend.daoImpl.ProductDAOImpl;
 import org.astashonok.onlinestorebackend.dto.Product;

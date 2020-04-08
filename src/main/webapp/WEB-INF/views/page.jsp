@@ -24,8 +24,12 @@
         <!-- Bootstrap DataTable -->
         <link href="${contextRoot}/assets/css/dataTables.bootstrap.css" rel="stylesheet">
 
+        <!-- Bootstrap glyphicons-->
+        <link href="${contextRoot}/assets/css/bootstrap-glyphicons.css" rel="stylesheet">
+
         <!-- Custom styles for this template -->
         <link href="${contextRoot}/assets/css/myapp.css" rel="stylesheet">
+
     </head>
     <body>
         <div class="wrapper">

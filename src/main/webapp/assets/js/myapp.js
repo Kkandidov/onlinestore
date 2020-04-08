@@ -54,7 +54,14 @@ $(function() {
 						data: 'quantity'
 					},
 					{
-						data: 'id'
+						data: 'id',
+						bSortable: false,
+						render: function(data, type, row){
+							var str = '';
+							str += '<a href="' + window.contextRoot + '/show/' + data + '/product" class="btn btn-primary"><span class="glyphicon glyphicon-eye-open" aria-label="Left Align"></span></a>';
+							str += '<a href="' + window.contextRoot + '/cart/add/' + data + '/product" class="btn btn-success"><span class="glyphicon glyphicon-shopping-cart" aria-label="Left Align"></span></a>';
+							return str;
+						}
 					}
 					]
 			});
