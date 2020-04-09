@@ -1,6 +1,6 @@
 -- populate categories table
 INSERT INTO categories(name, active)
-VALUES('Mobile phone', true);
+VALUES('Mobile', true);
 INSERT INTO categories(name, active)
 VALUES('Television', true);
 INSERT INTO categories(name, active)

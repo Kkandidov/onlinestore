@@ -8,11 +8,24 @@
 			<div class="row">
 			    <nav aria-label="breadcrumb">
 				    <c:if test="${allProductsClicked == true}">
+				        <script>
+                    	    window.categoryId = '';
+                    	</script>
 				        <ol class="breadcrumb">
-					        <li class="breadcrumb-item"><a href="${contextRoot}/home">Home</a></li>
+					        <li class="breadcrumb-item"><a href="${contextRoot}/?command=home">Home</a></li>
 						    <li class="breadcrumb-item active" aria-current="page">All Products</li>
 					    </ol>
                     </c:if>
+                    <c:if test="${categoryProductsClicked == true}">
+                    	<script>
+                            window.categoryId = '${category.id}';
+                        </script>
+    					<ol class="breadcrumb">
+        					<li class="breadcrumb-item"><a href="${contextRoot}/?command=home">Home</a></li>
+        					<li class="breadcrumb-item">Category</li>
+        					<li class="breadcrumb-item active" aria-current="page">${category.name}</li>
+        				</ol>
+        			</c:if>
 				</nav>
 			</div>
 			

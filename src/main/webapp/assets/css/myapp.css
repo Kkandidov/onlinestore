@@ -31,3 +31,15 @@ html {
 	width:100px;
 	height: 100px;
 }
+
+.carousel-indicators .active{
+    background-color: #f00;
+}
+
+.carousel-control-prev-icon{
+	background-color: #f00;
+}
+
+.carousel-control-next-icon{
+	background-color: #f00;
+}

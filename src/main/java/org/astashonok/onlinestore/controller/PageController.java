@@ -1,5 +1,7 @@
-package org.astashonok.onlinestore.controller.pagecontroller;
+package org.astashonok.onlinestore.controller;
 
+import org.astashonok.onlinestore.controller.service.Command;
+import org.astashonok.onlinestore.util.CommandContainer;
 import org.astashonok.onlinestore.util.inject.DIServlet;
 import org.astashonok.onlinestore.util.ServletService;
 
@@ -9,18 +11,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/about")
-public class AboutPageController extends DIServlet {
-    private static final String HOME_PATH = "/WEB-INF/views/page.jsp";
+@WebServlet("/")
+public class PageController extends DIServlet {
+    private static final String PATH = "/WEB-INF/views/";
+    private CommandContainer commandContainer = CommandContainer.getInstance();
 
     private void processRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            req.setAttribute("title", "About Us");
-            req.setAttribute("aboutClicked", true);
-            ServletService.forwardRequest(req, resp, HOME_PATH);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Command command = commandContainer.getCommand(req.getParameter("command"));
+        ServletService.forwardRequest(req, resp, PATH + command.execute(req, resp));
     }
 
     @Override

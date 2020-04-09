@@ -18,12 +18,17 @@ $(function() {
             break;
     }
 
-	var jsonUrl = window.contextRoot + '/rest/json/data/all/products';
-
     // code for jquery dataTable
     var $table = $('#productListTable');
-	        if($table.length){
-			$table.DataTable({
+	if($table.length){
+	    var jsonUrl = '';
+        if (window.categoryId == '') {
+            jsonUrl = window.contextRoot + '/rest/json/data/all/products';
+        } else {
+            jsonUrl = window.contextRoot + '/rest/json/data/category/'
+            + window.categoryId + '/products';
+        }
+            $table.DataTable({
 			lengthMenu: [[3,5,10,-1],['3 Records','5 Records','10 Records', 'ALL']],
 		    pageLength: 5,
 			ajax:{
@@ -58,7 +63,7 @@ $(function() {
 						bSortable: false,
 						render: function(data, type, row){
 							var str = '';
-							str += '<a href="' + window.contextRoot + '/show/' + data + '/product" class="btn btn-primary"><span class="glyphicon glyphicon-eye-open" aria-label="Left Align"></span></a>';
+							str += '<a href="' + window.contextRoot + '?command=show.product&id=' + data + '" class="btn btn-primary"><span class="glyphicon glyphicon-eye-open" aria-label="Left Align"></span></a>';
 							str += '<a href="' + window.contextRoot + '/cart/add/' + data + '/product" class="btn btn-success"><span class="glyphicon glyphicon-shopping-cart" aria-label="Left Align"></span></a>';
 							return str;
 						}

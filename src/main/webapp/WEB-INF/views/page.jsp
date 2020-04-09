@@ -57,6 +57,11 @@
                     <c:if test="${allProductsClicked == true or categoryProductsClicked == true}">
                         <%@include file="listProducts.jsp"%>
                     </c:if>
+
+                    <!-- Loading only when user clicks show product -->
+                    <c:if test="${showSingleProductClicked == true}">
+                        <%@include file="singleProduct.jsp"%>
+                    </c:if>
                 </div>
 
             <!-- Footer -->
