@@ -20,7 +20,7 @@
         <javax.servlet.jsp-api.version>2.3.3</javax.servlet.jsp-api.version>
         <javaee-api.version>8.0.1</javaee-api.version>
         <jstl.version>1.2</jstl.version>
-        <springframework.version>5.2.5.RELEASE</springframework.version>
+        <springframework.version>5.3.19</springframework.version>
         <jersey.version>1.19.4</jersey.version>
     </properties>
 
